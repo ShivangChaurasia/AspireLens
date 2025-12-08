@@ -1,4 +1,5 @@
-import Login from "./Login.jsx";
+
+import { Link } from "react-router-dom";
 
 export default function HeroSection() {
     return (
@@ -29,11 +30,11 @@ export default function HeroSection() {
           </span>
         </p>
 
-        {/* CTA Buttons */}
+        {/* Button */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-          <a href="/Login"><button className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold text-lg rounded-xl hover:from-blue-700 hover:to-cyan-700 transform hover:-translate-y-1 transition-all duration-300 shadow-xl hover:shadow-2xl w-full sm:w-auto">
+          <Link to="/login"><button className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold text-lg rounded-xl hover:from-blue-700 hover:to-cyan-700 transform hover:-translate-y-1 transition-all duration-300 shadow-xl hover:shadow-2xl w-full sm:w-auto">
             Evalute Your Career
-          </button></a>
+          </button></Link>
         </div>
 
         {/* Stats/Features */}
