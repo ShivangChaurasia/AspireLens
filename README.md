@@ -124,7 +124,7 @@ AspireLens/
 ### **1. Clone Repository**
 
 ```bash
-git clone https://github.com/your-username/AspireLens.git
+git clone https://github.com/ShivangChaurasia/AspireLens.git
 cd AspireLens
 ```
 
