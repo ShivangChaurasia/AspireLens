@@ -136,7 +136,7 @@ export default function SignUp() {
                     </span>
                   </div>
                   <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                    <div 
+                    <div
                       className={`h-full transition-all duration-300 ${
                         passwordStrength >= 4 ? 'w-full bg-green-500' :
                         passwordStrength >= 3 ? 'w-3/4 bg-yellow-500' :
@@ -303,7 +303,7 @@ export default function SignUp() {
                   <p className="text-gray-600">Connect with like-minded explorers and experts</p>
                 </div>
               </div>
-              
+
               <div className="flex items-start">
                 <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-amber-100 flex items-center justify-center mr-4">
                   <span className="text-amber-600 text-xl">🎁</span>
