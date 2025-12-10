@@ -3,23 +3,27 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { connectDB } from "./config/db.js";
 
-dotenv.config();
+import authRoutes from "./routes/authRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
+dotenv.config();
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-// Test Route
+// Routes
+app.use("/api/auth", authRoutes);       // student auth
+app.use("/api/admin", adminRoutes);     // admin portal login
+
 app.get("/", (req, res) => {
-  res.json({ message: "AspireLens Backend is Running..." });
+  res.json({ message: "AspireLens Backend Running" });
 });
 
 const PORT = process.env.PORT || 5000;
 
-// Connect Database & Start Server
 connectDB().then(() => {
   app.listen(PORT, () => {
-    console.log(`🚀 Server is running on http://localhost:${PORT}`);
+    console.log(`🚀 Server running at http://localhost:${PORT}`);
   });
 });
