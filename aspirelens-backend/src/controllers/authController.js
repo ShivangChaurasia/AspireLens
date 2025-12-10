@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import { sendEmail } from "../utils/sendEmail.js";
 
 export const register = async (req, res) => {
   try {
@@ -40,6 +41,22 @@ export const register = async (req, res) => {
         role: user.role,
       },
     });
+
+    await sendEmail(
+      email,
+      "Welcome to AspireLens!",
+      `Hi ${firstName},
+
+      Thank you for signing up at AspireLens!
+      We’re excited to help you explore your strengths and guide you toward the right career path.
+
+      You can now log in and complete your profile to get started.
+
+      Best Regards,
+      AspireLens Team`
+    );
+
+
   } catch (error) {
     console.error("Register Error:", error.message);
     res.status(500).json({ message: "Server error" });

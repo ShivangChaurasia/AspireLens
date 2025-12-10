@@ -1,8 +1,9 @@
 import express from "express";
-import { adminLogin } from "../controllers/adminAuthController.js";
+import { adminLoginPassword, verifyAdminOTP } from "../controllers/adminAuthController.js";
 
 const router = express.Router();
 
-router.post("/login", adminLogin);
+router.post("/login-password", adminLoginPassword);
+router.post("/verify-otp", verifyAdminOTP);
 
 export default router;

@@ -6,7 +6,7 @@ export default function Navbar() {
       <Link to="/"><img src="/aspirelens-logo.png" alt="AspireLens Logo" className="h-32 w-32 mr-2 ml-4"/></Link>
       <ul className="flex space-x-8 ml-auto mr-6 font-bold">
         <li className="hover:text-yellow-300"><Link to="/">Home</Link></li>
-        <li className="hover:text-yellow-300"><Link to="/about">About</Link></li>
+        <li className="hover:text-yellow-300"><Link to="/admin">Admin Portal</Link></li>
         <li className="hover:text-yellow-300"><Link to="/contact">Contact</Link></li>
       </ul>
       <div className="space-x-2  font-bold">
