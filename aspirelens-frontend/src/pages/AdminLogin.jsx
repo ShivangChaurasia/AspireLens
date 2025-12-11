@@ -306,7 +306,7 @@ export default function AdminLoginPage() {
                     <h3 className="text-xl font-bold text-white mb-2">Security Key Login</h3>
                     <p className="text-gray-400 text-sm">Insert your physical security key</p>
                   </div>
-                  
+
                   <form onSubmit={handleSecurityKeySubmit} className="space-y-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">

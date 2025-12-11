@@ -1,10 +1,14 @@
 import { useState } from 'react';
 import { User, Mail, Lock, Eye, EyeOff, Check } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 export default function SignUp() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
+    firstname: '',
+    lastname: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -28,14 +32,38 @@ export default function SignUp() {
     checkPasswordStrength(newPassword);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords don't match!");
-      return;
-    }
-    console.log('Signup data:', formData);
-    // Handle signup logic here
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  // Check password match
+  if (formData.password !== formData.confirmPassword) {
+    alert("Passwords don't match!");
+    return;
+  }
+
+  // Check if terms accepted
+  if (!formData.agreeToTerms) {
+    alert("You must agree to the Terms & Privacy Policy.");
+    return;
+  }
+
+  try {
+    const res = await axios.post("http://localhost:5000/api/auth/register", {
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      password: formData.password
+    });
+
+    console.log("Signup success:", res.data);
+
+    // Redirect user to email verification instructions page
+    navigate("/verify-email-info");
+
+    } catch (error) {
+      console.error("Signup Error:", error.response?.data || error);
+      alert(error.response?.data?.message || "Signup failed");
+  }
   };
 
   return (
@@ -53,7 +81,7 @@ export default function SignUp() {
             {/* Name Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Full Name
+                First Name
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -61,10 +89,28 @@ export default function SignUp() {
                 </div>
                 <input
                   type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  value={formData.firstName}
+                  onChange={(e) => setFormData({...formData, firstName: e.target.value})}
                   className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                  placeholder="John Doe"
+                  placeholder="First Name"
+                  required
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Last Name
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <User className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  value={formData.lastName}
+                  onChange={(e) => setFormData({...formData, lastName: e.target.value})}
+                  className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  placeholder="Last Name"
                   required
                 />
               </div>

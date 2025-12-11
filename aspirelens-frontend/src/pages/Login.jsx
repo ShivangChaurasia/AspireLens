@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -9,16 +12,32 @@ export default function Login() {
     rememberMe: false
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login data:', formData);
-    // Handle login logic here
+    try {
+      const res = await axios.post("http://localhost:5000/api/auth/login", {
+        email: formData.email,
+        password: formData.password
+      });
+
+      // Save token
+      localStorage.setItem("token", res.data.token);
+
+      // Redirect
+      navigate("/dashboard");
+
+      console.log("Login Successful:", res.data);
+
+    } catch (error) {
+      console.error("Login Error:", error.response?.data || error);
+      alert(error.response?.data?.message || "Login failed");
+    }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-white flex items-center justify-center p-4">
       <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-        
+
         {/* Left Side - Brand/Info */}
         <div className="hidden lg:block">
           <div className="max-w-lg">

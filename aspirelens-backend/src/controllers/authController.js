@@ -2,17 +2,21 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import { sendEmail } from "../utils/sendEmail.js";
+import crypto from "crypto";
 
+//
+// ======================= REGISTER =======================
+//
 export const register = async (req, res) => {
   try {
     const { firstName, lastName, email, password } = req.body;
 
-    // Check missing fields
+    // Validate
     if (!firstName || !lastName || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    // Check if email exists
+    // Check if email already exists
     const exists = await User.findOne({ email });
     if (exists) {
       return res.status(400).json({ message: "Email already exists" });
@@ -22,8 +26,8 @@ export const register = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
 
-    // Create student (default role = student)
-    const user = await User.create({
+    // Create new user
+    const newUser = new User({
       firstName,
       lastName,
       email,
@@ -31,31 +35,46 @@ export const register = async (req, res) => {
       role: "student",
     });
 
-    res.status(201).json({
-      message: "Signup successful",
-      user: {
-        id: user._id,
-        firstName,
-        lastName,
-        email,
-        role: user.role,
-      },
-    });
+    // Generate Email Verification Token
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+    const verificationExpiry = Date.now() + 1000 * 60 * 60; // 1 hour
 
+    newUser.emailVerificationToken = verificationToken;
+    newUser.emailVerificationExpires = verificationExpiry;
+
+    // Save user
+    await newUser.save();
+
+    // Build verification URL
+    // const verifyUrl = `http://localhost:5173/verify-email?token=${verificationToken}`;
+    const verifyUrl = `http://localhost:5000/api/auth/verify-email?token=${verificationToken}`;
+
+    // Send verification email
     await sendEmail(
       email,
-      "Welcome to AspireLens!",
+      "Verify your AspireLens email",
       `Hi ${firstName},
 
-      Thank you for signing up at AspireLens!
-      We’re excited to help you explore your strengths and guide you toward the right career path.
+      Please verify your email by clicking the link below:
+      ${verifyUrl}
 
-      You can now log in and complete your profile to get started.
+      This link expires in 1 hour.
 
       Best Regards,
       AspireLens Team`
     );
 
+    // Response
+    res.status(201).json({
+      message: "Signup successful — please verify your email.",
+      user: {
+        id: newUser._id,
+        firstName,
+        lastName,
+        email,
+        role: newUser.role,
+      },
+    });
 
   } catch (error) {
     console.error("Register Error:", error.message);
@@ -63,25 +82,78 @@ export const register = async (req, res) => {
   }
 };
 
+//
+// ======================= VERIFY EMAIL =======================
+//
+export const verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.query;
 
+    const user = await User.findOne({
+      emailVerificationToken: token,
+      emailVerificationExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    user.isEmailVerified = true;
+    user.emailVerificationToken = null;
+    user.emailVerificationExpires = null;
+
+    await user.save();
+
+    // OPTIONAL: Send welcome email after verification
+
+    await sendEmail(
+      user.email,
+      "Welcome to AspireLens!",
+      `Hi ${user.firstName},
+      Thank you for verifying your email!
+      You can now log in and continue your journey.
+      Best Regards,
+      AspireLens Team`
+    );
+
+    return res.redirect("http://localhost:5173/verify-email");
+
+  } catch (error) {
+    console.error("Verify Email Error:", error.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+//
+// ======================= LOGIN =======================
+//
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validate
+    // Check inputs
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password required" });
     }
 
-    // Check user
+    // Find user
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // Verify password
-    const match = await bcrypt.compare(password, user.passwordHash);
-    if (!match) return res.status(401).json({ message: "Incorrect password" });
+    // Block login if email not verified
+    if (!user.isEmailVerified) {
+      return res.status(403).json({
+        message: "Please verify your email before logging in."
+      });
+    }
 
-    // Create JWT
+    // Check password
+    const match = await bcrypt.compare(password, user.passwordHash);
+    if (!match) {
+      return res.status(401).json({ message: "Incorrect password" });
+    }
+
+    // Create token
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
@@ -100,6 +172,7 @@ export const login = async (req, res) => {
         isProfileComplete: user.isProfileComplete,
       },
     });
+
   } catch (error) {
     console.error("Login Error:", error.message);
     res.status(500).json({ message: "Server error" });

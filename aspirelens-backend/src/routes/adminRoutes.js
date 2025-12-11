@@ -1,9 +1,18 @@
 import express from "express";
-import { adminLoginPassword, verifyAdminOTP } from "../controllers/adminAuthController.js";
+import { verifyAdminToken } from "../middleware/adminAuth.js";
+import {
+  getAllUsers,
+  getUserById,
+  updateUserRole,
+  deleteUser
+} from "../controllers/adminController.js";
 
 const router = express.Router();
 
-router.post("/login-password", adminLoginPassword);
-router.post("/verify-otp", verifyAdminOTP);
+// Admin-only routes
+router.get("/users", verifyAdminToken, getAllUsers);
+router.get("/users/:id", verifyAdminToken, getUserById);
+router.put("/update-role/:id", verifyAdminToken, updateUserRole);
+router.delete("/users/:id", verifyAdminToken, deleteUser);
 
 export default router;
