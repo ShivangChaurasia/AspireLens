@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import { sendEmail } from "../utils/sendEmail.js";
 import crypto from "crypto";
+import { updateUserActivity } from "../utils/updateActivity.js";
 
 //
 // ======================= REGISTER =======================
@@ -147,12 +148,15 @@ export const login = async (req, res) => {
       });
     }
 
+
+
     // Check password
     const match = await bcrypt.compare(password, user.passwordHash);
     if (!match) {
       return res.status(401).json({ message: "Incorrect password" });
     }
 
+    await updateUserActivity(user._id);
     // Create token
     const token = jwt.sign(
       { id: user._id, role: user.role },
@@ -177,4 +181,12 @@ export const login = async (req, res) => {
     console.error("Login Error:", error.message);
     res.status(500).json({ message: "Server error" });
   }
+};
+
+// ======================= GET CURRENT USER =======================
+export const getCurrentUser = (req, res) => {
+  return res.status(200).json({
+    success: true,
+    user: req.user,  // This works because middleware attaches user object
+  });
 };

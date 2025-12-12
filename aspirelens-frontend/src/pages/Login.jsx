@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useContext } from 'react';
+import AuthContext from '../context/AuthContext';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -11,6 +13,8 @@ export default function Login() {
     password: '',
     rememberMe: false
   });
+  const { setUser } = useContext(AuthContext);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,11 +24,9 @@ export default function Login() {
         password: formData.password
       });
 
-      // Save token
       localStorage.setItem("token", res.data.token);
-
-      // Redirect
-      navigate("/dashboard");
+      setUser(res.data.user); // update context immediately
+      navigate("/home-hero");
 
       console.log("Login Successful:", res.data);
 
@@ -49,16 +51,16 @@ export default function Login() {
                 AspireLens
               </h1>
             </div>
-            
+
             <h2 className="text-4xl font-bold text-gray-900 mb-6">
               See Your World
               <span className="block text-blue-600">More Clearly</span>
             </h2>
-            
+
             <p className="text-gray-600 text-lg mb-10">
               Access personalized insights, smart analytics, and tools that help you navigate your educational journey with precision.
             </p>
-            
+
             {/* Features */}
             <div className="space-y-6">
               <div className="flex items-center">

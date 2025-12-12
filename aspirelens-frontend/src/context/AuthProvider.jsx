@@ -1,10 +1,16 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import AuthContext from "./authContext";
+import AuthContext from "./AuthContext";
+
+
 
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
+  const logout = () => {
+    localStorage.removeItem("token"); // remove JWT
+    setUser(null); // immediately update state
+  };
 
   useEffect(() => {
     const loadUser = async () => {
@@ -32,8 +38,9 @@ export default function AuthProvider({ children }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, setUser, loadingUser }}>
+    <AuthContext.Provider value={{ user, setUser, loadingUser, logout }}>
       {children}
     </AuthContext.Provider>
+
   );
 }
