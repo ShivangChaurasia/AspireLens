@@ -1,28 +1,17 @@
 import mongoose from "mongoose";
 
-const answerSchema = new mongoose.Schema(
+const sectionScoreSchema = new mongoose.Schema(
   {
-    questionId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Question",
+    section: { type: String, required: true }, // verbal, analytical, domain
+    subject: { type: String, default: null },  // optional
+    score: { type: Number, required: true },
+    maxScore: { type: Number, required: true },
+    accuracy: { type: Number, required: true }, // %
+    strengthLevel: {
+      type: String,
+      enum: ["weak", "average", "strong"],
       required: true,
     },
-    selectedOption: {
-      type: String, // "A", "B", "C", etc.
-      required: true,
-    },
-  },
-  { _id: false }
-);
-
-const sectionScoresSchema = new mongoose.Schema(
-  {
-    analytical: { type: Number, default: 0 },
-    reasoning: { type: Number, default: 0 },
-    verbal: { type: Number, default: 0 },
-    math: { type: Number, default: 0 },
-    creative: { type: Number, default: 0 },
-    digital: { type: Number, default: 0 },
   },
   { _id: false }
 );
@@ -33,61 +22,67 @@ const testResultSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      index: true,
     },
 
-    // Snapshot of profile at the time of test
-    classLevel: {
-      type: String,
-      default: null,
-    },
-    stream: {
-      type: String,
-      default: null,
+    testSessionId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "TestSession",
+      required: true,
+      unique: true,
     },
 
-    answers: {
-      type: [answerSchema],
-      default: [],
-    },
-
-    sectionScores: {
-      type: sectionScoresSchema,
-      default: () => ({}),
-    },
-
+    // Overall score
     totalScore: {
       type: Number,
-      default: 0,
+      required: true,
     },
 
-    // Will hold AI-generated personalized career report text
-    careerReportText: {
-      type: String,
+    maxScore: {
+      type: Number,
+      required: true,
+    },
+
+    percentile: {
+      type: Number, // calculated later (optional)
       default: null,
     },
 
-    // For structured AI response (JSON) if needed
-    careerReportJSON: {
-      type: Object,
-      default: null,
+    // Section-wise analysis
+    sectionScores: {
+      type: [sectionScoreSchema],
+      required: true,
     },
 
-    // From your future rule-based + AI hybrid engine:
-    recommendedStreams: {
-      type: [String], // e.g. ["PCM", "Commerce"]
-      default: [],
+    // AI-generated insights
+    aiAnalysis: {
+      strengths: { type: [String], default: [] },
+      weaknesses: { type: [String], default: [] },
+      learningStyle: { type: String, default: null },
+      behaviorInsights: { type: String, default: null },
     },
 
-    recommendedCareers: [
+    // Career counselling output
+    careerRecommendations: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Career",
+        career: { type: String, required: true },
+        priority: {
+          type: Number, // 1 = best fit
+          required: true,
+        },
+        reason: { type: String, required: true },
       },
     ],
 
-    isReportGenerated: {
-      type: Boolean,
-      default: false,
+    // Actionable roadmap
+    improvementPlan: {
+      durationDays: { type: Number, default: 30 },
+      steps: { type: [String], default: [] },
+    },
+
+    evaluatedAt: {
+      type: Date,
+      default: Date.now,
     },
   },
   { timestamps: true }
