@@ -1,10 +1,13 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.ASPIRE_AI_KEY);
 
-/**
- * Generate AI questions (MCQ)
- */
+/* =========================================================
+   AI QUESTION GENERATION (MCQ ONLY)
+========================================================= */
 export const generateQuestionsWithAI = async ({
   subject,
   section,
@@ -50,20 +53,45 @@ JSON Format:
 `;
 
   const result = await model.generateContent(prompt);
-  const text = result.response.text();
+  let text = result.response.text();
 
+  // 🔥 Remove markdown wrappers
+  text = text.replace(/```json/g, "").replace(/```/g, "").trim();
+
+  let parsed;
   try {
-    return JSON.parse(text);
-  } catch (error) {
-    console.error("AI Question JSON Error:", text);
+    parsed = JSON.parse(text);
+  } catch (err) {
+    console.error("❌ AI Question JSON Error (raw):", text);
     throw new Error("Invalid AI question response");
   }
+
+  // ✅ Normalize + Validate
+  return parsed.map((q, index) => {
+    if (
+      !q.questionText ||
+      !Array.isArray(q.options) ||
+      q.options.length !== 4 ||
+      !q.correctOption
+    ) {
+      throw new Error(`Invalid question structure at index ${index}`);
+    }
+
+    return {
+      questionText: q.questionText,
+      options: q.options.map((opt) => ({
+        label: opt.label,
+        text: opt.text || opt.label,
+      })),
+      correctOption: q.correctOption,
+      difficulty: q.difficulty || "medium",
+    };
+  });
 };
 
-/**
- * AI ANSWER EVALUATION SERVICE
- * Used for short / subjective answers
- */
+/* =========================================================
+   AI ANSWER EVALUATION (SUBJECTIVE)
+========================================================= */
 export const evaluateAnswerWithAI = async ({
   question,
   answer,
@@ -76,8 +104,6 @@ export const evaluateAnswerWithAI = async ({
   const prompt = `
 You are an exam evaluator.
 
-Evaluate the student's answer strictly based on the question.
-
 Question:
 "${question}"
 
@@ -87,11 +113,11 @@ Student Answer:
 Evaluation Rules:
 - Score out of ${maxMarks}
 - Consider clarity, relevance, logic, and correctness
-- Be fair, not lenient
+- Be fair and objective
 - Provide constructive feedback
-- Provide one improvement tip
+- Provide ONE improvement tip
 
-Return STRICT JSON only in this format:
+Return STRICT JSON only:
 {
   "score": number,
   "feedback": "string",
@@ -100,20 +126,22 @@ Return STRICT JSON only in this format:
 `;
 
   const result = await model.generateContent(prompt);
-  const text = result.response.text();
+  let text = result.response.text();
+
+  // 🔥 Sanitize JSON
+  text = text.replace(/```json/g, "").replace(/```/g, "").trim();
 
   try {
     return JSON.parse(text);
   } catch (error) {
-    console.error("AI Evaluation JSON Error:", text);
+    console.error("❌ AI Evaluation JSON Error (raw):", text);
     throw new Error("Invalid AI evaluation response");
   }
 };
 
-/**
- * AI CAREER COUNSELLING SERVICE
- * Generates personalized career advice based on test performance
- */
+/* =========================================================
+   AI CAREER COUNSELLING
+========================================================= */
 export const generateCareerCounsellingWithAI = async ({
   classLevel,
   stream,
@@ -126,12 +154,10 @@ export const generateCareerCounsellingWithAI = async ({
   });
 
   const prompt = `
-You are a career counsellor for students.
+You are a professional career counsellor for students.
 
-Based on the student's test performance, provide personalized career counselling.
-
-Student Details:
-- Class: ${classLevel}
+Student Profile:
+- Class Level: ${classLevel}
 - Stream: ${stream}
 - Test Level: ${level}
 - Tests Taken: ${testsTaken}
@@ -139,28 +165,41 @@ Student Details:
 Performance Summary:
 ${JSON.stringify(performance, null, 2)}
 
-Counselling Requirements:
-- Identify 3-5 key strengths based on performance
-- Identify 2-3 areas for improvement
-- Suggest 3-5 suitable career paths/recommendations
-- Provide a 4-6 point improvement plan
+Instructions:
+- Identify key strengths
+- Identify weak areas
+- Recommend career paths in PRIORITY ORDER
+- Suggest skill improvements
+- Provide a short 30-day improvement plan
 
-Return STRICT JSON only in this format:
+Return STRICT JSON only:
 {
-  "strengths": ["string1", "string2", ...],
-  "weaknesses": ["string1", "string2", ...],
-  "careerRecommendations": ["string1", "string2", ...],
-  "improvementPlan": ["string1", "string2", ...]
+  "strengths": [],
+  "weaknesses": [],
+  "careerRecommendations": [],
+  "improvementPlan": []
 }
 `;
 
   const result = await model.generateContent(prompt);
-  const text = result.response.text();
+  let text = result.response.text();
 
+  // 🔥 Remove markdown formatting
+  text = text.replace(/```json/g, "").replace(/```/g, "").trim();
+
+  let parsed;
   try {
-    return JSON.parse(text);
+    parsed = JSON.parse(text);
   } catch (error) {
-    console.error("AI Counselling JSON Error:", text);
+    console.error("❌ AI Counselling JSON Error (raw):", text);
     throw new Error("Invalid AI counselling response");
   }
+
+  // ✅ Normalize output
+  return {
+    strengths: parsed.strengths || [],
+    weaknesses: parsed.weaknesses || [],
+    careerRecommendations: parsed.careerRecommendations || [],
+    improvementPlan: parsed.improvementPlan || [],
+  };
 };

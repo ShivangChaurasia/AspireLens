@@ -73,7 +73,7 @@ export const evaluateTestAnswers = async (req, res) => {
     };
 
     // ✅ Mark evaluation complete
-    testSession.status = "evaluated";
+    testSession.status = "submitted";
     await testSession.save();
 
     return res.json({

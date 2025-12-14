@@ -4,16 +4,16 @@ import UserAnswer from "../../models/UserAnswer.js";
 import { generateCareerCounsellingWithAI } from "../../services/openaiService.js";
 
 /**
- * AI CAREER COUNSELLING CONTROLLER
- * POST /api/counselling/:testSessionId
+ * AI CAREER COUNSELLING
+ * POST /api/counselling/generate/:testSessionId
  */
 export const generateCareerCounselling = async (req, res) => {
   try {
     const { testSessionId } = req.params;
 
-    // 1️⃣ Fetch test session (must be evaluated)
+    // 1️⃣ Fetch test session
     const test = await TestSession.findById(testSessionId);
-    if (!test || test.status !== "evaluated") {
+    if (!test || test.status !== "submitted") {
       return res.status(400).json({ message: "Test not ready for counselling" });
     }
 
@@ -26,6 +26,11 @@ export const generateCareerCounselling = async (req, res) => {
     // 3️⃣ Fetch answers
     const answers = await UserAnswer.find({ testSessionId });
 
+    if (!answers.length) {
+      return res.status(400).json({ message: "No answers found" });
+    }
+
+    // 4️⃣ Build performance summary
     const sectionStats = {};
     const speedStats = {};
 
@@ -46,12 +51,12 @@ export const generateCareerCounselling = async (req, res) => {
         percentage: Math.round((data.score / data.max) * 100),
         avgTime: Math.round(
           speedStats[section].reduce((a, b) => a + b, 0) /
-          speedStats[section].length
+            speedStats[section].length
         ),
       })
     );
 
-    // 4️⃣ Call Gemini counselling service
+    // 5️⃣ Call Gemini AI
     const counselling = await generateCareerCounsellingWithAI({
       classLevel: test.classLevel,
       stream: test.stream,
@@ -60,15 +65,14 @@ export const generateCareerCounselling = async (req, res) => {
       performance,
     });
 
-    // 5️⃣ Save counselling output
+    // 6️⃣ Save insights
     test.aiInsights = {
       strengths: counselling.strengths,
       weaknesses: counselling.weaknesses,
       careerRecommendations: counselling.careerRecommendations,
-      improvementPlan: counselling.improvementPlan,
+      improvementPlan: counselling.improvementPlan.join("\n"),
     };
 
-    test.status = "counselling_generated";
     await test.save();
 
     return res.json({
@@ -78,6 +82,7 @@ export const generateCareerCounselling = async (req, res) => {
 
   } catch (error) {
     console.error("Career Counselling Error:", error);
-    res.status(500).json({ message: "Career counselling failed" });
+    return res.status(500).json({ message: "Career counselling failed" });
   }
 };
+
