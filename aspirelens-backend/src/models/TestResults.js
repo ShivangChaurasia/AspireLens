@@ -1,91 +1,76 @@
-import mongoose from "mongoose";
+// models/TestResult.js
+import mongoose from 'mongoose';
 
-const sectionScoreSchema = new mongoose.Schema(
-  {
-    section: { type: String, required: true }, // verbal, analytical, domain
-    subject: { type: String, default: null },  // optional
-    score: { type: Number, required: true },
-    maxScore: { type: Number, required: true },
-    accuracy: { type: Number, required: true }, // %
-    strengthLevel: {
-      type: String,
-      enum: ["weak", "average", "strong"],
-      required: true,
-    },
+const testResultSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
   },
-  { _id: false }
-);
-
-const testResultSchema = new mongoose.Schema(
-  {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-      index: true,
-    },
-
-    testSessionId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "TestSession",
-      required: true,
-      unique: true,
-    },
-
-    // Overall score
-    totalScore: {
-      type: Number,
-      required: true,
-    },
-
-    maxScore: {
-      type: Number,
-      required: true,
-    },
-
-    percentile: {
-      type: Number, // calculated later (optional)
-      default: null,
-    },
-
-    // Section-wise analysis
-    sectionScores: {
-      type: [sectionScoreSchema],
-      required: true,
-    },
-
-    // AI-generated insights
-    aiAnalysis: {
-      strengths: { type: [String], default: [] },
-      weaknesses: { type: [String], default: [] },
-      learningStyle: { type: String, default: null },
-      behaviorInsights: { type: String, default: null },
-    },
-
-    // Career counselling output
-    careerRecommendations: [
-      {
-        career: { type: String, required: true },
-        priority: {
-          type: Number, // 1 = best fit
-          required: true,
-        },
-        reason: { type: String, required: true },
-      },
-    ],
-
-    // Actionable roadmap
-    improvementPlan: {
-      durationDays: { type: Number, default: 30 },
-      steps: { type: [String], default: [] },
-    },
-
-    evaluatedAt: {
-      type: Date,
-      default: Date.now,
-    },
+  testSessionId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'TestSession',
+    required: true,
+    unique: true
   },
-  { timestamps: true }
-);
+  totalQuestions: {
+    type: Number,
+    required: true,
+    default: 0
+  },
+  attemptedQuestions: {
+    type: Number,
+    required: true,
+    default: 0
+  },
+  correctAnswers: {
+    type: Number,
+    required: true,
+    default: 0
+  },
+  wrongAnswers: {
+    type: Number,
+    required: true,
+    default: 0
+  },
+  scorePercentage: {
+    type: Number,
+    required: true,
+    default: 0
+  },
+  sectionWiseScore: {
+    type: Map,
+    of: {
+      correct: Number,
+      total: Number,
+      percentage: Number
+    },
+    default: {}
+  },
+  status: {
+    type: String,
+    enum: ['pending_evaluation', 'evaluated'],
+    default: 'pending_evaluation'
+  },
+  evaluatedAt: {
+    type: Date
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
+  }
+}, {
+  timestamps: true
+});
 
-export default mongoose.model("TestResult", testResultSchema);
+// Index for faster queries
+testResultSchema.index({ userId: 1, testSessionId: 1 });
+testResultSchema.index({ status: 1 });
+
+const TestResult = mongoose.model('TestResult', testResultSchema);
+
+export default TestResult;

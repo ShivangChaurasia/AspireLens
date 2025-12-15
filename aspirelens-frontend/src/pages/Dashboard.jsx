@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import AuthContext from "../context/AuthContext";
+import { Link } from "react-router-dom";
 
 import { 
   TrendingUp, 
@@ -250,9 +251,12 @@ export default function Dashboard() {
               <p className="text-gray-600 mb-6">
                 Analyze your interests, strengths, and future career opportunities with AI-powered insights.
               </p>
-              <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-700 transform hover:-translate-y-0.5 transition-all duration-300 shadow-lg hover:shadow-xl">
-                Start Assessment
-              </button>
+
+              <Link to="/start-test">
+                <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-700 transform hover:-translate-y-0.5 transition-all duration-300 shadow-lg hover:shadow-xl">
+                  Start Assessment
+                </button>
+              </Link>
             </div>
 
             {/* Goal Suggestions Card */}

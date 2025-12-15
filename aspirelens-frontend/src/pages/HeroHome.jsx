@@ -43,7 +43,7 @@ export default function HeroHome() {
             </button>
           </Link>
 
-          <Link to="/tests">
+          <Link to="/start-test">
             <button className="px-8 py-4 bg-white border border-blue-300 text-blue-700 font-semibold text-lg rounded-xl hover:bg-blue-50 transform hover:-translate-y-1 transition-all duration-300 shadow-md w-full sm:w-auto">
               Take Career Assessment
             </button>

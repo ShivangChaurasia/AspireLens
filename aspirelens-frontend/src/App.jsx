@@ -10,15 +10,31 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import Dashboard from './pages/Dashboard.jsx';
 import HeroHome from './pages/HeroHome.jsx';
 import MyProfile from './pages/MyProfile.jsx';
+import StartTest from './pages/StartTest.jsx';
+import TestRunner from './pages/TestRunner.jsx';
+import TestSubmitted from './pages/TestSubmitted.jsx';
+import TestResult from './pages/TestResult.jsx';
 // import AdminDashboard from './pages/AdminDashboard.jsx';
 
 export default function App() {
     const location = useLocation();
-    const hideNav = ['/login', '/signup', '/verify-email-info', '/email-verified', '/verify-email'];
+    const hideNav = [
+      "/login",
+      "/signup",
+      "/verify-email-info",
+      "/email-verified",
+      "/verify-email",
+      "/start-test"
+    ];
+
+    const shouldHideNav =
+      hideNav.includes(location.pathname.toLowerCase()) ||
+      location.pathname.startsWith("/test/");
+
 
     return (
         <>
-            {(!hideNav.includes(location.pathname.toLowerCase())) && <Navbar />}
+            {!shouldHideNav && <Navbar />}
 
             <Routes>
                 <Route path="/Nav" element={<Navbar />} />
@@ -42,6 +58,24 @@ export default function App() {
                             <MyProfile />
                         </ProtectedRoute>
                     }/>
+
+                <Route path='/start-test' element={
+                    <ProtectedRoute>
+                        <StartTest />
+                    </ProtectedRoute>
+                }/>
+                <Route path="/test/:testSessionId" element={
+                    <ProtectedRoute>
+                        <TestRunner />
+                    </ProtectedRoute>
+                }/>
+                <Route path="/test/submitted/:testSessionId" element={
+                    <ProtectedRoute>
+                        <TestSubmitted />
+                    </ProtectedRoute>
+                }/>
+
+                <Route path="/results/:testSessionId" element={<TestResult />} />
 
                 {/* <Route path='/admin/dashboard' element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>}/> */}
             </Routes>

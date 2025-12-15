@@ -105,6 +105,18 @@ const testSessionSchema = new mongoose.Schema(
       default: null,
     },
 
+    autoSubmitted:{
+      type: Boolean,
+      default: null,
+
+    },
+
+    autoSubmitReason:{
+      type: String,
+      default:null,
+    },
+
+
     // Test state
     status: {
       type: String,
@@ -142,3 +154,6 @@ testSessionSchema.index({ startedAt: 1 });
 testSessionSchema.index({ level: 1 });
 
 export default mongoose.model("TestSession", testSessionSchema);
+
+
+
