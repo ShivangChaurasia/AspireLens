@@ -306,7 +306,7 @@ export default function TestResult() {
                   <BarChart className="h-6 w-6 text-green-600" />
                   <h2 className="text-xl font-bold text-gray-900">Score Summary</h2>
                 </div>
-                
+
                 {/* Overall Score Circle */}
                 <div className="flex flex-col items-center mb-8">
                   <div className="relative">

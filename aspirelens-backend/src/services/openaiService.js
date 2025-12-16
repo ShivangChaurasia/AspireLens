@@ -143,48 +143,92 @@ Return STRICT JSON only:
    AI CAREER COUNSELLING
 ========================================================= */
 export const generateCareerCounsellingWithAI = async ({
-  classLevel,
-  stream,
+  educationLevel,
+  educationStage,
+  interests,
   level,
-  testsTaken,
+  scorePercentage,
   performance,
+  testsTaken,
 }) => {
   const model = genAI.getGenerativeModel({
     model: "gemini-2.5-flash",
   });
 
   const prompt = `
-You are a professional career counsellor for students.
+You are a senior career counsellor and aptitude analyst.
 
-Student Profile:
-- Class Level: ${classLevel}
-- Stream: ${stream}
-- Test Level: ${level}
-- Tests Taken: ${testsTaken}
+Your task is to generate a REALISTIC, UNBIASED, and ACTIONABLE career counselling report.
+Do NOT exaggerate abilities.
+Do NOT guarantee success.
+Avoid motivational or emotional language.
 
-Performance Summary:
-${JSON.stringify(performance, null, 2)}
+--------------------------------------------------
+STUDENT PROFILE
+--------------------------------------------------
+Education Level: ${educationLevel}
+Education Stage: ${educationStage || "Not specified"}
+Current Test Level: ${level}
+Total Tests Taken: ${testsTaken}
+Declared Interests: ${interests.join(", ") || "Not specified"}
 
-Instructions:
-- Identify key strengths
-- Identify weak areas
-- Recommend career paths in PRIORITY ORDER
-- Suggest skill improvements
-- Provide a short 30-day improvement plan
+--------------------------------------------------
+TEST PERFORMANCE
+--------------------------------------------------
+Overall Score: ${scorePercentage}%
 
-Return STRICT JSON only:
+Section-wise Performance:
+${performance
+  .map(
+    (p) =>
+      `- ${p.section}: ${p.percentage}%`
+  )
+  .join("\n")}
+
+--------------------------------------------------
+STRICT ANALYSIS RULES
+--------------------------------------------------
+1. Strengths → sections with ≥ 70%
+2. Weaknesses → sections with < 40%
+3. 40–69% → developing areas (do NOT mark as strength)
+4. Career recommendations must align with BOTH:
+   - aptitude performance
+   - declared interests
+5. If interest conflicts with aptitude, clearly mention risk.
+6. Suggest ONLY 2–4 career paths.
+7. Provide a PRACTICAL 30–60 day improvement plan.
+8. If performance is low, recommend foundation building, NOT careers.
+
+--------------------------------------------------
+OUTPUT FORMAT (STRICT JSON ONLY)
+--------------------------------------------------
 {
-  "strengths": [],
-  "weaknesses": [],
-  "careerRecommendations": [],
-  "improvementPlan": []
+  "strengths": ["..."],
+  "weaknesses": ["..."],
+  "developingAreas": ["..."],
+  "careerRecommendations": [
+    {
+      "career": "...",
+      "reason": "...",
+      "suitabilityLevel": "High | Medium | Low"
+    }
+  ],
+  "improvementPlan": [
+    "...",
+    "..."
+  ],
+  "nextTestAdvice": "..."
 }
+
+Return only valid JSON.
+No markdown.
+No explanation text.
 `;
 
   const result = await model.generateContent(prompt);
   let text = result.response.text();
 
-  // 🔥 Remove markdown formatting
+  // 🔥 Safety cleanup
   text = text.replace(/```json/g, "").replace(/```/g, "").trim();
 
   let parsed;
@@ -195,11 +239,14 @@ Return STRICT JSON only:
     throw new Error("Invalid AI counselling response");
   }
 
-  // ✅ Normalize output
+  // ✅ Normalized response
   return {
     strengths: parsed.strengths || [],
     weaknesses: parsed.weaknesses || [],
+    developingAreas: parsed.developingAreas || [],
     careerRecommendations: parsed.careerRecommendations || [],
     improvementPlan: parsed.improvementPlan || [],
+    nextTestAdvice: parsed.nextTestAdvice || "",
   };
 };
+

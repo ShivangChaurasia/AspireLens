@@ -1,4 +1,5 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
+import WelcomePage from './pages/Welcome.jsx';
 import Navbar from "./components/Navbar";
 import HeroSection from "./pages/HeroSection";
 import Login from "./pages/Login.jsx";
@@ -33,12 +34,14 @@ export default function App() {
 
 
     return (
-        <>
-            {!shouldHideNav && <Navbar />}
 
+        <>
+
+            {!shouldHideNav && <Navbar />}
             <Routes>
+                <Route path='/' element={<WelcomePage></WelcomePage>}/>
                 <Route path="/Nav" element={<Navbar />} />
-                <Route path="/" element={<HeroSection />} />
+                <Route path="/home  " element={<HeroSection />} />
                 <Route path="/home-hero" element={<HeroHome />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<SignUp />} />

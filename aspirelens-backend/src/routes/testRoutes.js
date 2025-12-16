@@ -5,10 +5,18 @@ import { saveAnswer } from "../controllers/tests/saveAnswer.js";
 import { submitTest } from "../controllers/tests/submitTest.js";
 import { getTestSession } from "../controllers/tests/getTestSession.js";
 import { getSubmittedTest } from "../controllers/tests/getSubmittedTest.js";
+import { evaluateTest } from "../controllers/tests/evaluateTest.js";
 import { getTestResult } from '../controllers/tests/getTestResult.js';
 import { getTestResultPDF } from '../controllers/tests/getTestResultPDF.js'; // Optional
 
 const router = express.Router();
+
+
+router.post(
+  "/evaluate/:testSessionId",
+  requireAuth,
+  evaluateTest
+);
 
 
 

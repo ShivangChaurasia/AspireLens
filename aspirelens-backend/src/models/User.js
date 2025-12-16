@@ -4,7 +4,7 @@ const userSchema = new mongoose.Schema(
   {
     firstName: { type: String, required: true, trim: true },
     lastName: { type: String, required: true, trim: true },
-    
+
     email: {
       type: String,
       required: true,
@@ -12,10 +12,12 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
-    
+
     passwordHash: { type: String, required: true },
+
+    // ⚠️ DEPRECATED (keep for migration only)
     classLevel: { type: String, default: null },
-    
+
     role: {
       type: String,
       enum: ["student", "teacher", "admin"],
@@ -25,22 +27,35 @@ const userSchema = new mongoose.Schema(
     otp: String,
     otpExpiresAt: Date,
 
-    // OLD fields (backward compatibility)
-
-    // KEEP THIS — used by Career Roadmap later
+    // Shared fields
     stream: { type: String, default: null },
-
-    // KEEP THIS — used by interests page
     interests: { type: [String], default: [] },
 
-    // MAIN PROFILE OBJECT (used by MyProfile frontend)
+    // ✅ SINGLE SOURCE OF TRUTH
     profile: {
       age: Number,
-      educationLevel: String,
+
+      // PRIMARY EDUCATION LEVEL
+      educationLevel: {
+        type: String,
+        enum: ["School", "Undergraduate", "Postgraduate", "Professional"],
+        required: true,
+      },
+
+      // CONDITIONAL STAGE
+      // School → 11,12
+      // UG/PG → year1, year2, year3, year4
+      educationStage: {
+        type: String,
+        default: null,
+      },
+
       stream: String,
       interests: [String],
+
       testsTaken: { type: Number, default: 0 },
       profileCompletion: { type: Number, default: 0 },
+
       joinedAt: { type: Date, default: Date.now },
       lastActive: { type: Date, default: Date.now },
     },
@@ -56,13 +71,31 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Always ensure profile object exists
+/**
+ * 🔒 VALIDATION GUARD
+ */
 userSchema.pre("save", function () {
   if (!this.profile) this.profile = {};
-  if (!this.profile.joinedAt) this.profile.joinedAt = new Date();
-  if (!this.profile.lastActive) this.profile.lastActive = new Date();
+
+  const level = this.profile.educationLevel;
+  const stage = this.profile.educationStage;
+
+  if (level === "School" && !["11", "12"].includes(stage)) {
+    throw new Error("School students must have class 11 or 12");
+  }
+
+  if (
+    ["Undergraduate", "Postgraduate"].includes(level) &&
+    !["1", "2", "3", "4"].includes(stage)
+  ) {
+    throw new Error("UG/PG students must have a valid year");
+  }
+
+  if (level === "Professional") {
+    this.profile.educationStage = null;
+  }
+
+  this.profile.lastActive = new Date();
 });
-
-
 
 export default mongoose.model("User", userSchema);

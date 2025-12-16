@@ -43,7 +43,7 @@ export default function MyProfile() {
     lastName: "",
     age: "",
     educationLevel: "",
-    classLevel: "",
+    educationStage: "",  // ADDED: Education stage field
     stream: "",
     interests: ""
   });
@@ -130,15 +130,15 @@ export default function MyProfile() {
       const completion = data.profile?.profileCompletion || 0;
       setProfileCompletion(completion);
       
-      // Fill edit form
+      // Fill edit form - USE ONLY PROFILE FIELDS
       setEditForm({
         firstName: data.firstName || "",
         lastName: data.lastName || "",
         age: data.profile?.age ? String(data.profile.age) : "",
         educationLevel: data.profile?.educationLevel || "",
-        classLevel: data.classLevel || "",
-        stream: data.stream || data.profile?.stream || "",
-        interests: data.interests?.join(", ") || data.profile?.interests?.join(", ") || ""
+        educationStage: data.profile?.educationStage || "", // FIXED: Use profile.educationStage
+        stream: data.profile?.stream || "", // FIXED: Use only profile.stream
+        interests: data.profile?.interests?.join(", ") || "" // FIXED: Use only profile.interests
       });
       
     } catch (error) {
@@ -169,6 +169,16 @@ export default function MyProfile() {
         errors.age = "Age must be between 12 and 100";
       }
     }
+    
+    // Validate education level and stage
+    if (!editForm.educationLevel) {
+      errors.educationLevel = "Education level is required";
+    } else if (editForm.educationLevel === "School" && !["11", "12"].includes(editForm.educationStage)) {
+      errors.educationStage = "School students must select class 11 or 12";
+    } else if (["Undergraduate", "Postgraduate"].includes(editForm.educationLevel) && !["1", "2", "3", "4"].includes(editForm.educationStage)) {
+      errors.educationStage = "UG/PG students must select a valid year";
+    }
+    
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -194,16 +204,14 @@ export default function MyProfile() {
         .map(i => i.trim())
         .filter(i => i.length > 0);
 
-      // Prepare update data
+      // Prepare update data - SEND ONLY PROFILE FIELDS
       const updateData = {
         firstName: editForm.firstName.trim(),
         lastName: editForm.lastName.trim(),
-        classLevel: editForm.classLevel || null,
-        stream: editForm.stream.trim() || null,
-        interests: formattedInterests,
         profile: {
           age: editForm.age ? parseInt(editForm.age) : null,
-          educationLevel: editForm.educationLevel.trim() || null,
+          educationLevel: editForm.educationLevel.trim(),
+          educationStage: editForm.educationStage.trim() || null,
           stream: editForm.stream.trim() || null,
           interests: formattedInterests
         }
@@ -221,14 +229,15 @@ export default function MyProfile() {
       setProfileData(updatedData);
       setProfileCompletion(updatedData.profile?.profileCompletion || 0);
 
-      // Update edit form
+      // Update edit form with PROFILE DATA ONLY
       setEditForm({
         firstName: updatedData.firstName || "",
         lastName: updatedData.lastName || "",
         age: updatedData.profile?.age ? String(updatedData.profile.age) : "",
         educationLevel: updatedData.profile?.educationLevel || "",
-        stream: updatedData.stream || updatedData.profile?.stream || "",
-        interests: updatedData.interests?.join(", ") || updatedData.profile?.interests?.join(", ") || ""
+        educationStage: updatedData.profile?.educationStage || "",
+        stream: updatedData.profile?.stream || "",
+        interests: updatedData.profile?.interests?.join(", ") || ""
       });
 
       setIsEditing(false);
@@ -258,8 +267,9 @@ export default function MyProfile() {
         lastName: profileData.lastName || "",
         age: profileData.profile?.age ? String(profileData.profile.age) : "",
         educationLevel: profileData.profile?.educationLevel || "",
-        stream: profileData.stream || profileData.profile?.stream || "",
-        interests: profileData.interests?.join(", ") || profileData.profile?.interests?.join(", ") || ""
+        educationStage: profileData.profile?.educationStage || "",
+        stream: profileData.profile?.stream || "",
+        interests: profileData.profile?.interests?.join(", ") || ""
       });
     }
     setIsEditing(false);
@@ -270,18 +280,6 @@ export default function MyProfile() {
     navigate("/login");
   };
 
-  // Loading state
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-12 w-12 text-blue-500 animate-spin mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-700">Loading your profile...</h2>
-          <p className="text-gray-500 mt-2">Please wait</p>
-        </div>
-      </div>
-    );
-  }
   const handlePasswordChange = async () => {
     setPasswordError("");
     setPasswordSuccess("");
@@ -339,7 +337,19 @@ export default function MyProfile() {
     }
   };
 
-  
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 text-blue-500 animate-spin mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-700">Loading your profile...</h2>
+          <p className="text-gray-500 mt-2">Please wait</p>
+        </div>
+      </div>
+    );
+  }
+
   // Error state - No token
   if (error && !getToken()) {
     return (
@@ -379,8 +389,29 @@ export default function MyProfile() {
     );
   }
 
-  
-  
+  // Get education stage options based on level
+  const getEducationStageOptions = (level) => {
+    switch(level) {
+      case "School":
+        return [
+          { value: "", label: "Select Class" },
+          { value: "11", label: "Class 11" },
+          { value: "12", label: "Class 12" }
+        ];
+      case "Undergraduate":
+      case "Postgraduate":
+        return [
+          { value: "", label: "Select Year" },
+          { value: "1", label: "Year 1" },
+          { value: "2", label: "Year 2" },
+          { value: "3", label: "Year 3" },
+          { value: "4", label: "Year 4" }
+        ];
+      default:
+        return [{ value: "", label: "Not applicable" }];
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 p-4 md:p-8">
         {showPasswordModal && (
@@ -664,23 +695,28 @@ export default function MyProfile() {
               </h3>
               
               <div className="space-y-4">
-                {/* Education Level */}
+                {/* Education Level - FIXED VALUES */}
                 <div className="bg-gradient-to-r from-gray-50 to-white p-4 rounded-xl border border-gray-200">
-                  <label className="text-sm font-medium text-gray-500 mb-1 block">Education Level</label>
+                  <label className="text-sm font-medium text-gray-500 mb-1 block">Education Level *</label>
                   {isEditing ? (
-                    <select 
-                      value={editForm.educationLevel}
-                      onChange={(e) => setEditForm({...editForm, educationLevel: e.target.value})}
-                      className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value="">Select education level</option>
-                      <option value="High School">High School</option>
-                      <option value="Undergraduate">Undergraduate</option>
-                      <option value="Bachelor's Degree">Bachelor's Degree</option>
-                      <option value="Master's Degree">Master's Degree</option>
-                      <option value="PhD">PhD</option>
-                      <option value="Working Professional">Working Professional</option>
-                    </select>
+                    <div>
+                      <select 
+                        value={editForm.educationLevel}
+                        onChange={(e) => setEditForm({...editForm, educationLevel: e.target.value, educationStage: ""})}
+                        className={`w-full px-3 py-2 bg-white border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                          formErrors.educationLevel ? 'border-red-300' : 'border-gray-300'
+                        }`}
+                      >
+                        <option value="">Select education level</option>
+                        <option value="School">School</option>
+                        <option value="Undergraduate">Undergraduate</option>
+                        <option value="Postgraduate">Postgraduate</option>
+                        <option value="Professional">Professional</option>
+                      </select>
+                      {formErrors.educationLevel && (
+                        <p className="text-red-500 text-sm mt-1">{formErrors.educationLevel}</p>
+                      )}
+                    </div>
                   ) : (
                     <div className="flex items-center gap-2">
                       <GraduationCap className="h-5 w-5 text-gray-400" />
@@ -691,30 +727,47 @@ export default function MyProfile() {
                   )}
                 </div>
 
-                {/* Class Level */}
+                {/* Education Stage - DYNAMIC BASED ON LEVEL */}
                 <div className="bg-gradient-to-r from-gray-50 to-white p-4 rounded-xl border border-gray-200">
-                  <label className="text-sm font-medium text-gray-500 mb-1 block">Class Level</label>
+                  <label className="text-sm font-medium text-gray-500 mb-1 block">
+                    {editForm.educationLevel === "School" ? "Class" : 
+                     ["Undergraduate", "Postgraduate"].includes(editForm.educationLevel) ? "Year" : 
+                     "Stage"}
+                  </label>
                   {isEditing ? (
-                    <select
-                      value={editForm.classLevel || ""}
-                      onChange={(e) => setEditForm({ ...editForm, classLevel: e.target.value })}
-                      className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value="">Select Class</option>
-                      <option value="10">10th</option>
-                      <option value="11">11th</option>
-                      <option value="12">12th</option>
-                    </select>
+                    <div>
+                      <select
+                        value={editForm.educationStage || ""}
+                        onChange={(e) => setEditForm({ ...editForm, educationStage: e.target.value })}
+                        className={`w-full px-3 py-2 bg-white border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                          formErrors.educationStage ? 'border-red-300' : 'border-gray-300'
+                        }`}
+                        disabled={editForm.educationLevel === "Professional" || !editForm.educationLevel}
+                      >
+                        {getEducationStageOptions(editForm.educationLevel).map(option => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                      {formErrors.educationStage && (
+                        <p className="text-red-500 text-sm mt-1">{formErrors.educationStage}</p>
+                      )}
+                      {editForm.educationLevel === "Professional" && (
+                        <p className="text-gray-500 text-sm mt-1">Not applicable for professionals</p>
+                      )}
+                    </div>
                   ) : (
                     <div className="flex items-center gap-2">
                       <GraduationCap className="h-5 w-5 text-gray-400" />
                       <p className="text-lg font-medium text-gray-900">
-                        {displayValue(profileData?.classLevel)}
+                        {profileData?.profile?.educationLevel === "Professional" 
+                          ? "Not applicable" 
+                          : displayValue(profileData?.profile?.educationStage)}
                       </p>
                     </div>
                   )}
                 </div>
-
 
                 {/* Stream */}
                 <div className="bg-gradient-to-r from-gray-50 to-white p-4 rounded-xl border border-gray-200">
@@ -731,13 +784,13 @@ export default function MyProfile() {
                     <div className="flex items-center gap-2">
                       <BookOpen className="h-5 w-5 text-gray-400" />
                       <p className="text-lg font-medium text-gray-900">
-                        {displayValue(profileData?.stream || profileData?.profile?.stream)}
+                        {displayValue(profileData?.profile?.stream)}
                       </p>
                     </div>
                   )}
                 </div>
 
-                {/* Interests */}
+                {/* Interests - FIXED: Use only profile.interests */}
                 <div className="bg-gradient-to-r from-gray-50 to-white p-4 rounded-xl border border-gray-200">
                   <label className="text-sm font-medium text-gray-500 mb-1 block">Interests & Skills</label>
                   {isEditing ? (
@@ -749,9 +802,9 @@ export default function MyProfile() {
                     />
                   ) : (
                     <div className="mt-2">
-                      {profileData?.interests?.length > 0 || profileData?.profile?.interests?.length > 0 ? (
+                      {profileData?.profile?.interests?.length > 0 ? (
                         <div className="flex flex-wrap gap-2">
-                          {(profileData.interests || profileData.profile?.interests || []).map((interest, index) => (
+                          {profileData.profile.interests.map((interest, index) => (
                             <span 
                               key={index}
                               className="px-3 py-1.5 bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-700 rounded-lg text-sm font-medium border border-blue-200"
@@ -781,7 +834,6 @@ export default function MyProfile() {
                     >
                       Change Password
                     </button>
-
                   </div>
                 </div>
               </div>
@@ -823,10 +875,11 @@ export default function MyProfile() {
               <div className="space-y-3">
                 {[
                   { label: "Basic Information", completed: !!profileData?.firstName && !!profileData?.lastName },
-                  { label: "Academic Details", completed: !!(profileData?.stream || profileData?.profile?.stream) },
+                  { label: "Academic Details", completed: !!(profileData?.profile?.stream) },
                   { label: "Age Set", completed: !!profileData?.profile?.age },
                   { label: "Education Level", completed: !!profileData?.profile?.educationLevel },
-                  { label: "Interests Added", completed: !!(profileData?.interests?.length || profileData?.profile?.interests?.length) }
+                  { label: "Education Stage", completed: profileData?.profile?.educationLevel === "Professional" ? true : !!profileData?.profile?.educationStage },
+                  { label: "Interests Added", completed: !!(profileData?.profile?.interests?.length) }
                 ].map((item, index) => (
                   <div key={index} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors">
                     <div className="flex items-center gap-3">
@@ -865,47 +918,6 @@ export default function MyProfile() {
               </button>
             </div>
           </section>
-
-          {/* Activity Stats
-          <section className="bg-white rounded-3xl shadow-xl p-6 md:p-8 border border-gray-100">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="h-12 w-12 rounded-xl bg-gradient-to-r from-purple-100 to-pink-100 flex items-center justify-center">
-                <Target className="h-6 w-6 text-purple-600" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">Your Activity</h2>
-                <p className="text-gray-500">Recent engagement and achievements</p>
-              </div>
-            </div>
-
-            <div className="space-y-6">
-              {[
-                { icon: "🎯", label: "Career Assessments Taken", value: profileData?.profile?.testsTaken || 0, color: "blue" },
-                { icon: "📊", label: "Profile Completion", value: `${profileCompletion}%`, color: "purple" },
-                { icon: "🔥", label: "Last Active", value: formatLastActive(profileData?.profile?.lastActive), color: "orange" },
-                { icon: "✅", label: "Profile Status", value: profileData?.isProfileComplete ? "Complete" : "Incomplete", color: profileData?.isProfileComplete ? "green" : "yellow" }
-              ].map((stat, index) => (
-                <div key={index} className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-200 hover:border-gray-300 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="text-2xl">{stat.icon}</div>
-                    <div>
-                      <p className="font-medium text-gray-900">{stat.label}</p>
-                      <p className="text-sm text-gray-500">From your profile data</p>
-                    </div>
-                  </div>
-                  <div className={`text-xl font-bold ${
-                    stat.color === 'blue' ? 'text-blue-600' :
-                    stat.color === 'purple' ? 'text-purple-600' :
-                    stat.color === 'orange' ? 'text-amber-600' :
-                    stat.color === 'green' ? 'text-green-600' :
-                    'text-yellow-600'
-                  }`}>
-                    {stat.value}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section> */}
         </div>
 
         {/* --------------------------- */}

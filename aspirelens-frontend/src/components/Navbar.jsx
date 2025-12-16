@@ -11,7 +11,7 @@ export default function Navbar() {
       <Link to="/"><img src="/aspirelens-logo.png" alt="AspireLens Logo" className="h-32 w-32 mr-2 ml-4"/></Link>
       <ul className="flex space-x-8 ml-auto mr-6 font-bold">
         {user && <li className="hover:text-yellow-300"><Link to="/home-hero">Home</Link></li>}
-        {!user && <li className="hover:text-yellow-300"><Link to="/">Home</Link></li>}
+        {!user && <li className="hover:text-yellow-300"><Link to="/home">Home</Link></li>}
         {!user && (<li className="hover:text-yellow-300"><Link to="/admin">Admin Portal</Link></li>)}
         {user && (<li className="hover:text-yellow-300"><Link to="/dashboard">Dashboard</Link></li>)}
         {user && user.role === 'admin' && (<li className="hover:text-yellow-300"><Link to="/admin/dashboard">Admin Dashboard</Link></li>)}

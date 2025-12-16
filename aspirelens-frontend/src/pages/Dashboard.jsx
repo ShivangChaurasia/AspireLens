@@ -16,13 +16,13 @@ import {
   CheckCircle,
   Star,
   Award,
-  Zap
+  Zap,
+  Loader2
 } from "lucide-react";
 
 export default function Dashboard() {
   const { user } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
-
   const [stats, setStats] = useState({
     profileCompletion: 0,
     testsTaken: 0,
@@ -31,64 +31,80 @@ export default function Dashboard() {
     lastActive: null,
   });
 
-  // Fetch stats from backend
-  const fetchStats = async () => {
+  // Fetch user data (instead of separate stats endpoint)
+  const fetchUserData = async () => {
     try {
+      setLoading(true);
       const token = localStorage.getItem("token");
 
+      // Fetch fresh user data from backend
       const res = await axios.get(
-        "http://localhost:5000/api/dashboard/stats",
+        "http://localhost:5000/api/user/me",
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
+      const userData = res.data;
+      
+      // Calculate stats from user data
       setStats({
-        profileCompletion: res.data.profileCompletion || 0,
-        testsTaken: res.data.testsTaken || 0,
-        weeklyProgress: res.data.weeklyProgress || 0,
-        dailyStreak: res.data.dailyStreak || 0,
-        lastActive: res.data.lastActive || null,
+        profileCompletion: userData.profile?.profileCompletion || 0,
+        testsTaken: userData.profile?.testsTaken || 0,
+        weeklyProgress: Math.min(100, (userData.profile?.testsTaken || 0) * 20), // Example calculation
+        dailyStreak: 1, // Default - would come from separate streak tracking
+        lastActive: userData.profile?.lastActive || null,
       });
 
-      setLoading(false);
+      // Update activity in background
+      try {
+        await axios.post(
+          "http://localhost:5000/api/user/update-activity",
+          {},
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      } catch (activityErr) {
+        console.log("Activity update failed:", activityErr.message);
+      }
+
     } catch (err) {
       console.log("Dashboard Load Error:", err.response?.data || err);
+    } finally {
       setLoading(false);
-    }
-  };
-
-  // Update lastActive on visit
-  const updateActivity = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.post(
-        "http://localhost:5000/api/user/update-activity",
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-    } catch (err) {
-      console.log("Activity Update Error:", err.message);
     }
   };
 
   useEffect(() => {
-    const init = async () => {
-      await fetchStats();
-      await updateActivity();
-  };
-
-  init();
-}, []);
-
+    fetchUserData();
+  }, []);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-xl font-semibold">
-        Loading Dashboard...
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 text-blue-500 animate-spin mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-700">Loading your dashboard...</h2>
+        </div>
       </div>
     );
   }
 
-  const { profileCompletion, testsTaken, weeklyProgress, dailyStreak } = stats;
+  const { profileCompletion, testsTaken, dailyStreak } = stats;
+
+  // Format last active time
+  const formatLastActive = (dateString) => {
+    if (!dateString) return "Recently";
+    try {
+      const now = new Date();
+      const lastActive = new Date(dateString);
+      const diffHours = Math.floor((now - lastActive) / (1000 * 60 * 60));
+      
+      if (diffHours === 0) return "Just now";
+      if (diffHours === 1) return "1 hour ago";
+      if (diffHours < 24) return `${diffHours} hours ago`;
+      return "Today";
+    } catch {
+      return "Today";
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 p-4 md:p-8">
@@ -108,19 +124,25 @@ export default function Dashboard() {
               Hello, {user?.firstName || "Explorer"}! 👋
             </h1>
             <p className="text-blue-100 text-lg md:text-xl max-w-2xl">
-              Your journey to smarter career decisions continues. Here's your Dashborad.
+              Your journey to smarter career decisions continues. Here's your Dashboard.
             </p>
             
             <div className="flex items-center gap-4 mt-8">
               <div className="flex items-center gap-2 text-white/90">
                 <div className="h-2 w-2 rounded-full bg-white animate-pulse" />
-                <span className="text-sm">Last active: Today</span>
+                <span className="text-sm">
+                  Last active: {formatLastActive(stats.lastActive)}
+                </span>
               </div>
-              {/* <div className="h-4 w-px bg-white/30" />
-              <div className="flex items-center gap-2 text-white/90">
-                <Star className="h-4 w-4" />
-                <span className="text-sm">Premium Member</span>
-              </div> */}
+              {user?.profile?.educationLevel && (
+                <>
+                  <div className="h-4 w-px bg-white/30" />
+                  <div className="flex items-center gap-2 text-white/90">
+                    <BookOpen className="h-4 w-4" />
+                    <span className="text-sm">{user.profile.educationLevel}</span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
           
@@ -149,7 +171,12 @@ export default function Dashboard() {
                 <div className="text-3xl font-bold text-gray-900">
                   {profileCompletion}%
                 </div>
-                <div className="text-sm text-gray-500 mt-1">Almost there!</div>
+                <div className="text-sm text-gray-500 mt-1">
+                  {profileCompletion < 50 ? "Let's get started!" : 
+                   profileCompletion < 80 ? "Great progress!" : 
+                   profileCompletion < 100 ? "Almost there!" : 
+                   "Perfect! 🎉"}
+                </div>
               </div>
               <div className="h-2 bg-blue-100 rounded-full overflow-hidden">
                 <div 
@@ -170,7 +197,11 @@ export default function Dashboard() {
                 <div className="text-3xl font-bold text-gray-900">
                   {testsTaken}
                 </div>
-                <div className="text-sm text-gray-500 mt-1">This month</div>
+                <div className="text-sm text-gray-500 mt-1">
+                  {testsTaken === 0 ? "Ready for your first test?" : 
+                   testsTaken === 1 ? "Great start!" : 
+                   "Excellent progress!"}
+                </div>
               </div>
               <div className="flex items-center gap-1">
                 {[...Array(Math.min(testsTaken, 5))].map((_, i) => (
@@ -182,7 +213,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="group bg-gradient-to-br from-green-50 to-white p-6 rounded-2xl border border-green-100 hover:border-green-200 transition-all duration-300 hover:shadow-xl">
+            {/* <div className="group bg-gradient-to-br from-green-50 to-white p-6 rounded-2xl border border-green-100 hover:border-green-200 transition-all duration-300 hover:shadow-xl">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold text-gray-700">Weekly Progress</h3>
                 <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -193,13 +224,21 @@ export default function Dashboard() {
                 <div className="text-3xl font-bold text-gray-900">
                   {weeklyProgress}%
                 </div>
-                <div className="text-sm text-gray-500 mt-1">+12% from last week</div>
+                <div className="text-sm text-gray-500 mt-1">
+                  {weeklyProgress > 70 ? "Amazing pace! 🚀" : 
+                   weeklyProgress > 40 ? "Good progress!" : 
+                   "Let's build momentum!"}
+                </div>
               </div>
-              <div className="flex items-center text-green-600">
+              <div className={`flex items-center ${weeklyProgress > 50 ? "text-green-600" : "text-amber-600"}`}>
                 <TrendingUp className="h-4 w-4 mr-1" />
-                <span className="text-sm font-medium">Excellent pace!</span>
+                <span className="text-sm font-medium">
+                  {weeklyProgress > 70 ? "Excellent pace!" : 
+                   weeklyProgress > 40 ? "Steady progress" : 
+                   "Getting started"}
+                </span>
               </div>
-            </div>
+            </div> */}
 
             <div className="group bg-gradient-to-br from-amber-50 to-white p-6 rounded-2xl border border-amber-100 hover:border-amber-200 transition-all duration-300 hover:shadow-xl">
               <div className="flex items-center justify-between mb-4">
@@ -210,9 +249,13 @@ export default function Dashboard() {
               </div>
               <div className="mb-3">
                 <div className="text-3xl font-bold text-gray-900">
-                  {dailyStreak} days
+                  {dailyStreak} {dailyStreak === 1 ? "day" : "days"}
                 </div>
-                <div className="text-sm text-gray-500 mt-1">Keep going! 🔥</div>
+                <div className="text-sm text-gray-500 mt-1">
+                  {dailyStreak === 0 ? "Start your streak today!" :
+                   dailyStreak < 3 ? "Keep it up! 🔥" :
+                   "Impressive streak! 🌟"}
+                </div>
               </div>
               <div className="flex items-center">
                 {[...Array(Math.min(dailyStreak, 7))].map((_, i) => (
@@ -251,12 +294,25 @@ export default function Dashboard() {
               <p className="text-gray-600 mb-6">
                 Analyze your interests, strengths, and future career opportunities with AI-powered insights.
               </p>
-
-              <Link to="/start-test">
-                <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-700 transform hover:-translate-y-0.5 transition-all duration-300 shadow-lg hover:shadow-xl">
-                  Start Assessment
-                </button>
-              </Link>
+              
+              {profileCompletion < 80 ? (
+                <div className="space-y-3">
+                  <div className="text-sm text-amber-600 bg-amber-50 p-3 rounded-lg border border-amber-200">
+                    ⚡ Complete {100 - profileCompletion}% more of your profile for better assessment results
+                  </div>
+                  <Link to="/profile">
+                    <button className="w-full px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold rounded-xl hover:from-amber-600 hover:to-orange-600 transform hover:-translate-y-0.5 transition-all duration-300">
+                      Complete Profile
+                    </button>
+                  </Link>
+                </div>
+              ) : (
+                <Link to="/start-test">
+                  <button className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-700 transform hover:-translate-y-0.5 transition-all duration-300 shadow-lg hover:shadow-xl">
+                    Start Assessment
+                  </button>
+                </Link>
+              )}
             </div>
 
             {/* Goal Suggestions Card */}
@@ -266,66 +322,65 @@ export default function Dashboard() {
                   <Target className="h-7 w-7 text-white" />
                 </div>
                 <span className="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">
-                  New
+                  {testsTaken > 0 ? "Ready" : "Take Test First"}
                 </span>
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-3">
                 Goal Suggestions
               </h3>
               <p className="text-gray-600 mb-6">
-                Get AI-powered goals to accelerate your learning path and career growth.
+                Get AI-powered goals based on your assessment results and career interests.
               </p>
-              <button className="px-6 py-3 bg-gradient-to-r from-amber-600 to-orange-600 text-white font-semibold rounded-xl hover:from-amber-700 hover:to-orange-700 transform hover:-translate-y-0.5 transition-all duration-300 shadow-lg hover:shadow-xl">
-                Explore Goals
-              </button>
+              
+              {testsTaken > 0 ? (
+                <button className="w-full px-6 py-3 bg-gradient-to-r from-amber-600 to-orange-600 text-white font-semibold rounded-xl hover:from-amber-700 hover:to-orange-700 transform hover:-translate-y-0.5 transition-all duration-300 shadow-lg hover:shadow-xl">
+                  View Goals
+                </button>
+              ) : (
+                <div className="text-sm text-gray-500 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                  Complete a career assessment first to get personalized goals
+                </div>
+              )}
             </div>
           </div>
-
-          {/* AI Mentor Card */}
-            <div className="group relative bg-gradient-to-br from-white to-gray-50 p-8 rounded-3xl border border-gray-200 hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5" />
-              <div className="relative">
-                <div className="flex items-start justify-between mb-6">
-                  <div className="h-14 w-14 rounded-2xl bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center backdrop-blur-sm">
-                    <Sparkles className="h-7 w-7 text-white" />
-                  </div>
-                  <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
-                    Coming Soon
-                  </span>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                  AI Mentor
-                </h3>
-                <p className="text-gray-600 mb-6">
-                  Your personalized guidance assistant for learning and growth. Available soon!
-                </p>
-                <button 
-                  disabled
-                  className="px-6 py-3 bg-gray-200 text-gray-500 font-semibold rounded-xl cursor-not-allowed"
-                >
-                  Coming Soon
-                </button>
-              </div>
-            </div>
-
         </section>
 
-
         {/* ---------------------- */}
-        {/* 5. Additional Info Bar */}
+        {/* 5. Quick Actions */}
         {/* ---------------------- */}
-        <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl p-6 border border-blue-200">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <Clock className="h-6 w-6 text-blue-600" />
-              <div>
-                <h4 className="font-semibold text-gray-900">Need help getting started?</h4>
-                <p className="text-gray-600 text-sm">Check our onboarding guide</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Link to="/profile">
+            <div className="group bg-white p-6 rounded-2xl border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all cursor-pointer">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-semibold text-gray-900 group-hover:text-blue-600">My Profile</h4>
+                  <p className="text-sm text-gray-500 mt-1">Update your information</p>
+                </div>
+                <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-blue-500 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
-            <button className="px-6 py-3 bg-white text-blue-600 font-semibold rounded-xl border border-blue-200 hover:bg-blue-50 transition-colors">
-              View Guide
-            </button>
+          </Link>
+          
+          <Link to="/start-test">
+            <div className="group bg-white p-6 rounded-2xl border border-gray-200 hover:border-green-300 hover:shadow-lg transition-all cursor-pointer">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-semibold text-gray-900 group-hover:text-green-600">Start Test</h4>
+                  <p className="text-sm text-gray-500 mt-1">Begin assessment</p>
+                </div>
+                <Rocket className="h-5 w-5 text-gray-400 group-hover:text-green-500 group-hover:rotate-12 transition-transform" />
+              </div>
+            </div>
+          </Link>
+          
+          <div className="group bg-white p-6 rounded-2xl border border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all cursor-pointer">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-semibold text-gray-900 group-hover:text-purple-600">Learning Resources</h4>
+                <p className="text-sm text-gray-500 mt-1">Explore courses</p>
+              </div>
+              <BookOpen className="h-5 w-5 text-gray-400 group-hover:text-purple-500 group-hover:scale-110 transition-transform" />
+            </div>
           </div>
         </div>
       </div>

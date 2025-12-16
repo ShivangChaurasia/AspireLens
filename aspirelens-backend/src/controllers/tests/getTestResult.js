@@ -26,7 +26,7 @@ export const getTestResult = async (req, res) => {
     const testSession = await TestSession.findOne({
       _id: testSessionId,
       userId
-    }).select('status submittedAt totalQuestions level testName');
+    }).select("status submittedAt totalQuestions level testName");
 
     if (!testSession) {
       return res.status(404).json({
@@ -42,7 +42,6 @@ export const getTestResult = async (req, res) => {
     });
 
     if (!testResult) {
-      // If no result exists yet, return pending status with session data
       return res.status(200).json({
         success: true,
         testSessionId,
@@ -62,20 +61,31 @@ export const getTestResult = async (req, res) => {
     }
 
     // 4️⃣ Calculate derived fields
-    const unattemptedQuestions = Math.max(0, testResult.totalQuestions - testResult.attemptedQuestions);
-    const accuracy = testResult.attemptedQuestions > 0 
-      ? Math.round((testResult.correctAnswers / testResult.attemptedQuestions) * 100)
-      : 0;
+    const unattemptedQuestions = Math.max(
+      0,
+      testResult.totalQuestions - testResult.attemptedQuestions
+    );
 
-    // 5️⃣ Get user details for response
-    const user = await User.findById(userId).select('name email classLevel stream');
+    const accuracy =
+      testResult.attemptedQuestions > 0
+        ? Math.round(
+            (testResult.correctAnswers / testResult.attemptedQuestions) * 100
+          )
+        : 0;
+
+    // 5️⃣ Get user details (UPDATED HERE)
+    const user = await User.findById(userId).select(
+      "firstName lastName email profile"
+    );
 
     // 6️⃣ Prepare response
     const response = {
       success: true,
       testSessionId: testResult.testSessionId,
       status: testResult.status,
-      testName: testSession.testName || `Career Assessment - Level ${testSession.level || 1}`,
+      testName:
+        testSession.testName ||
+        `Career Assessment - Level ${testSession.level || 1}`,
       level: testSession.level || 1,
       totalQuestions: testResult.totalQuestions,
       attemptedQuestions: testResult.attemptedQuestions,
@@ -84,27 +94,36 @@ export const getTestResult = async (req, res) => {
       wrongAnswers: testResult.wrongAnswers,
       scorePercentage: testResult.scorePercentage,
       accuracyPercentage: accuracy,
-      sectionWiseScore: Object.fromEntries(testResult.sectionWiseScore),
+      sectionWiseScore: Object.fromEntries(testResult.sectionWiseScore || {}),
       submittedAt: testSession.submittedAt,
       evaluatedAt: testResult.evaluatedAt,
+
+      // ✅ FIXED USER DETAILS
       userDetails: {
-        name: user?.name || "User",
-        classLevel: user?.classLevel || "N/A",
-        stream: user?.stream || "N/A"
+        name: `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "User",
+        email: user?.email || "N/A",
+        educationLevel: user?.profile?.educationLevel || "N/A",
+        educationStage: user?.profile?.educationStage || "N/A",
+        interests: user?.profile?.interests || []
       }
     };
 
-    console.log(`[GetTestResult] Success: session=${testSessionId}, status=${testResult.status}`);
+    console.log(
+      `[GetTestResult] Success: session=${testSessionId}, status=${testResult.status}`
+    );
 
     return res.status(200).json(response);
 
   } catch (error) {
     console.error("[GetTestResult] Error:", error);
-    
+
     return res.status(500).json({
       success: false,
       message: "Failed to fetch test result",
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : undefined
     });
   }
 };

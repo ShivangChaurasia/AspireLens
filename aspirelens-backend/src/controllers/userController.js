@@ -23,11 +23,11 @@ export const getMyProfile = async (req, res) => {
   }
 };
 
-// In your backend controller (updateProfile function)
+// FIXED: updateProfile function - NO LEGACY FIELD SYNCING
 export const updateProfile = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { firstName, lastName, classLevel, stream, interests, profile } = req.body;
+    const { firstName, lastName, profile } = req.body; // REMOVED: classLevel, stream, interests from root
 
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -35,50 +35,56 @@ export const updateProfile = async (req, res) => {
     // Update basic fields
     if (firstName) user.firstName = firstName.trim();
     if (lastName) user.lastName = lastName.trim();
-    if (classLevel) user.classLevel = classLevel;
-    if (stream) user.stream = stream.trim();
-    if (interests) user.interests = interests;
+    // REMOVED: classLevel, stream, interests updates from root
 
     // PROFILE object exists?
     if (!user.profile) user.profile = {};
 
-    // Update profile fields
+    // Update profile fields ONLY
     if (profile) {
       if ("age" in profile) user.profile.age = profile.age;
       if ("educationLevel" in profile) user.profile.educationLevel = profile.educationLevel;
+      if ("educationStage" in profile) user.profile.educationStage = profile.educationStage; // ADDED
       if ("stream" in profile) user.profile.stream = profile.stream;
       if ("interests" in profile) user.profile.interests = profile.interests;
-      if ("stream" in profile) user.stream = profile.stream;
-      if ("interests" in profile) user.interests = profile.interests;
+      // REMOVED: Legacy field syncing (user.stream = profile.stream, user.interests = profile.interests)
     }
 
-    // Calculate profile completion
+    // Calculate profile completion (using PROFILE fields only)
     let completion = 0;
     if (user.firstName) completion += 20;
     if (user.lastName) completion += 20;
     if (user.profile.age) completion += 20;
     if (user.profile.educationLevel) completion += 20;
+    
+    // Check educationStage conditionally
+    if (user.profile.educationLevel === "Professional") {
+      completion += 20; // Professional doesn't need educationStage
+    } else if (user.profile.educationStage) {
+      completion += 20;
+    }
+    
     if (user.profile.interests?.length > 0) completion += 20;
 
-    user.profile.profileCompletion = completion;
-    user.isProfileComplete = completion === 100;
+    // Cap at 100%
+    user.profile.profileCompletion = Math.min(100, completion);
+    user.isProfileComplete = user.profile.profileCompletion === 100;
     user.profile.lastActive = new Date();
 
     const updatedUser = await user.save();
     
-    // IMPORTANT: Send complete response
+    // Return response with PROFILE fields only (no legacy sync)
     return res.json({
       _id: updatedUser._id,
       firstName: updatedUser.firstName,
       lastName: updatedUser.lastName,
-      email: updatedUser.email, // Make sure email is included
-      classLevel: updatedUser.classLevel,
-      stream: updatedUser.stream,
-      interests: updatedUser.interests,
+      email: updatedUser.email,
+      // REMOVED: classLevel, stream, interests from root level
       isProfileComplete: updatedUser.isProfileComplete,
       profile: {
         age: updatedUser.profile.age,
         educationLevel: updatedUser.profile.educationLevel,
+        educationStage: updatedUser.profile.educationStage, // ADDED
         stream: updatedUser.profile.stream,
         interests: updatedUser.profile.interests,
         testsTaken: updatedUser.profile.testsTaken,
@@ -94,52 +100,61 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-// POST /api/user/complete-profile
-// POST /api/user/complete-profile
+// FIXED: completeProfile function - NO LEGACY FIELD SYNCING
 export const completeProfile = async (req, res) => {
   try {
     const userId = req.user.id;
-
-    const { age, educationLevel, stream, interests } = req.body;
+    const { age, educationLevel, educationStage, stream, interests } = req.body; // REMOVED: classLevel
 
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
     if (!user.profile) user.profile = {};
 
-    // Basic fields
-    if (classLevel) user.classLevel = classLevel;
+    // Update profile fields ONLY
     if (age) user.profile.age = age;
     if (educationLevel) user.profile.educationLevel = educationLevel;
-
-    // Stream + interest sync (new & old)
+    if (educationStage) user.profile.educationStage = educationStage; // ADDED
+    
+    // Stream + interests - UPDATE PROFILE ONLY
     if (stream) {
       user.profile.stream = stream;
-      user.stream = stream;
+      // REMOVED: user.stream = stream (legacy sync)
     }
 
     if (interests) {
       user.profile.interests = interests;
-      user.interests = interests;
+      // REMOVED: user.interests = interests (legacy sync)
     }
 
-    // Calculate completion %
+    // Calculate completion % (using PROFILE fields only)
     let completion = 0;
+    if (user.firstName && user.lastName) completion += 20;
     if (user.profile.age) completion += 20;
     if (user.profile.educationLevel) completion += 20;
+    
+    // Check educationStage conditionally
+    if (user.profile.educationLevel === "Professional") {
+      completion += 20; // Professional doesn't need educationStage
+    } else if (user.profile.educationStage) {
+      completion += 20;
+    }
+    
     if (user.profile.stream) completion += 20;
     if (user.profile.interests?.length > 0) completion += 20;
-    if (user.firstName && user.lastName) completion += 20;
 
-    user.profile.profileCompletion = completion;
-    user.isProfileComplete = completion === 100;
+    user.profile.profileCompletion = Math.min(100, completion);
+    user.isProfileComplete = user.profile.profileCompletion === 100;
 
     // Last active update
     user.profile.lastActive = new Date();
 
     const updated = await user.save();
 
-    return res.json(updated);
+    return res.json({
+      ...updated.toObject(),
+      passwordHash: undefined // Hide password
+    });
 
   } catch (error) {
     console.error("Complete profile error:", error);
@@ -147,10 +162,7 @@ export const completeProfile = async (req, res) => {
   }
 };
 
-
 // =========================CHANGE PASSWORD ===========================
-
-
 export const changePassword = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -185,6 +197,3 @@ export const changePassword = async (req, res) => {
     return res.status(500).json({ message: "Server error while changing password" });
   }
 };
-
-
-

@@ -5,6 +5,15 @@ import { calculateNextLevel } from "../../utils/levelCalculator.js";
 import { generateQuestionsWithAI } from "../../services/openaiService.js";
 
 /**
+ * Map level to difficulty
+ */
+const mapLevelToDifficulty = (level) => {
+  if (level <= 2) return "easy";
+  if (level <= 4) return "medium";
+  return "hard";
+};
+
+/**
  * START TEST CONTROLLER
  * POST /api/test/start
  */
@@ -12,190 +21,136 @@ export const startTest = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // 1️⃣ Get user
+    // 1️⃣ Fetch user
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ 
-        success: false,
-        message: "User not found" 
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // 🔐 Ensure usedQuestions always exists (CRITICAL FIX)
+    if (!Array.isArray(user.usedQuestions)) {
+      user.usedQuestions = [];
+    }
+
+    // ✅ REQUIRED by Question schema
+    const stream =
+      user.profile?.stream ||
+      user.stream ||
+      "Generic";
+
+    // ✅ Authoritative profile fields
+    const { educationLevel, educationStage, interests } = user.profile || {};
+
+    if (!educationLevel || !educationStage || !interests?.length) {
+      return res.status(400).json({
+        message: "Complete profile (education & interests) to start test",
       });
     }
 
-    const classLevel = user.classLevel;
-    const stream = user.stream || "Generic";
-
-    // 2️⃣ Check for existing tests with different logic
-    const existingTest = await TestSession.findOne({
+    // 2️⃣ Resume existing test if any
+    const existingSession = await TestSession.findOne({
       userId,
-      status: { $in: ["not_started", "in_progress"] },
+      status: { $in: ["in_progress", "not_started"] },
     });
 
-    if (existingTest) {
-      // 🎯 CRITICAL FIX: Handle "not_started" status differently
-      if (existingTest.status === "not_started") {
-        // Allow user to restart a "not_started" test
-        console.log(`[StartTest] Found not_started test: ${existingTest._id}, allowing restart`);
-        
-        // Update status to "in_progress" and set timestamps
-        const updatedTest = await TestSession.findByIdAndUpdate(
-          existingTest._id,
-          {
-            status: "in_progress",
-            startedAt: new Date(),
-            endsAt: new Date(Date.now() + existingTest.totalQuestions * 60 * 1000),
-            lastUpdated: new Date()
-          },
-          { new: true }
-        );
-
-        // Get the questions for this test
-        const questions = await Question.find({
-          _id: { $in: existingTest.questionIds }
-        }).lean();
-
-        return res.status(200).json({
-          success: true,
-          message: "Resuming previously created test",
-          testSessionId: existingTest._id,
-          testInProgress: false, // Not in progress yet
-          testResumed: true,
-          level: existingTest.level,
-          totalQuestions: existingTest.totalQuestions,
-          durationMinutes: existingTest.durationMinutes,
-          questions: questions,
-          status: "in_progress",
-          createdAt: existingTest.createdAt,
-          testName: `Career Assessment - Level ${existingTest.level}`
-        });
-      }
-      
-      // If test is "in_progress", return it for continuation
-      if (existingTest.status === "in_progress") {
-        console.log(`[StartTest] Found in_progress test: ${existingTest._id}`);
-        
-        // Get the questions for this test
-        const questions = await Question.find({
-          _id: { $in: existingTest.questionIds }
-        }).lean();
-
-        return res.status(200).json({
-          success: true,
-          message: "You have a test in progress",
-          testSessionId: existingTest._id,
-          testInProgress: true,
-          testResumed: false,
-          level: existingTest.level,
-          totalQuestions: existingTest.totalQuestions,
-          durationMinutes: existingTest.durationMinutes,
-          questions: questions,
-          status: "in_progress",
-          startedAt: existingTest.startedAt,
-          endsAt: existingTest.endsAt,
-          testName: `Career Assessment - Level ${existingTest.level}`
-        });
-      }
+    if (existingSession) {
+      return res.status(200).json({
+        testSessionId: existingSession._id,
+        status: existingSession.status,
+        level: existingSession.level,
+        durationMinutes: existingSession.durationMinutes,
+        totalQuestions: existingSession.totalQuestions,
+        testName: `Career Assessment - Level ${existingSession.level}`,
+      });
     }
 
-    // 3️⃣ Calculate next level
+    // 3️⃣ Determine level & difficulty
     const level = await calculateNextLevel(userId);
+    const difficulty = mapLevelToDifficulty(level);
 
-    // Map level → difficulty
-    const difficulty =
-      level <= 2 ? "easy" :
-      level <= 4 ? "medium" :
-      "hard";
-
-    // 4️⃣ Decide subjects (Verbal mandatory)
-    let subjects = [
-      {
-        subject: "Verbal Ability",
-        section: "verbal",
-        totalQuestions: 10,
-        difficulty,
-      },
+    // 4️⃣ Decide subjects (interest-driven)
+    const subjects = [
+      { section: "verbal", subject: "Verbal Ability", count: 10 },
+      { section: "analytical", subject: "Logical Reasoning", count: 10 },
+      { section: "math", subject: "Quantitative Aptitude", count: 10 },
     ];
 
-    if (classLevel === "10") {
-      subjects.push(
-        { subject: "Logical Reasoning", section: "analytical", totalQuestions: 10, difficulty },
-        { subject: "Quantitative Aptitude", section: "math", totalQuestions: 10, difficulty }
-      );
-    }
+    interests.forEach((interest) => {
+      subjects.push({
+        section: "domain",
+        subject: interest,
+        count: 10,
+      });
+    });
 
-    if (classLevel === "12" && stream === "PCM") {
-      subjects.push(
-        { subject: "Physics Aptitude", section: "domain", totalQuestions: 10, difficulty },
-        { subject: "Mathematics Aptitude", section: "math", totalQuestions: 10, difficulty }
-      );
-    }
+    // Hard limit
+    const finalSubjects = subjects.slice(0, 6);
 
-    if (classLevel === "12" && stream === "Commerce") {
-      subjects.push(
-        { subject: "Business Logic", section: "domain", totalQuestions: 10, difficulty },
-        { subject: "Quantitative Aptitude", section: "math", totalQuestions: 10, difficulty }
-      );
-    }
-
-    if (stream === "CSE" || stream === "IT") {
-      subjects.push(
-        { subject: "Computer Science", section: "domain", totalQuestions: 10, difficulty },
-        { subject: "Logical Reasoning", section: "analytical", totalQuestions: 10, difficulty }
-      );
-    }
-
-    // Limit subjects
-    subjects = subjects.slice(0, 6);
-    
-    // 5️⃣ Fetch questions (DB first, AI fallback)
     let questionIds = [];
     let totalQuestions = 0;
 
-    for (const s of subjects) {
-      // 5.1 Try DB first
+    // 5️⃣ Fetch questions (DB first → AI fallback)
+    for (const s of finalSubjects) {
       let questions = await Question.find({
-        classLevel,
+        educationLevel,
+        $or: [{ educationStage }, { educationStage: null }],
         section: s.section,
+        subject: s.subject,
+        stream: { $in: [stream, "Generic"] },
+        difficulty,
         isActive: true,
-        $or: [{ stream }, { stream: "Generic" }],
-        difficulty: s.difficulty,
-      }).limit(s.totalQuestions);
+        _id: { $nin: user.usedQuestions },
+      }).limit(s.count);
 
-      // 5.2 If DB is insufficient → generate via AI
-      if (questions.length < s.totalQuestions) {
-        const needed = s.totalQuestions - questions.length;
+      // 🧠 AI fallback (NON-FATAL)
+      if (questions.length < s.count) {
+        const needed = s.count - questions.length;
+        let aiQuestions = [];
 
-        const aiQuestions = await generateQuestionsWithAI({
-          subject: s.subject,
-          section: s.section,
-          classLevel,
-          stream,
-          difficulty: s.difficulty,
-          count: needed,
-        });
-
-        const savedQuestions = await Question.insertMany(
-          aiQuestions.map((q) => ({
-            classLevel,
-            stream,
-            section: s.section,
+        try {
+          aiQuestions = await generateQuestionsWithAI({
+            educationLevel,
+            educationStage,
             subject: s.subject,
-            questionText: q.questionText,
-            options: q.options,
-            correctOption: q.correctOption,
-            difficulty: q.difficulty,
-            isAIgenerated: true,
-            isActive: true,
-          }))
-        );
+            section: s.section,
+            difficulty,
+            count: needed,
+          });
+        } catch (aiError) {
+          console.error(
+            `AI Question Generation Failed (${s.subject}):`,
+            aiError.message
+          );
+          aiQuestions = [];
+        }
 
-        questions.push(...savedQuestions);
+        // Save AI questions only if available
+        if (aiQuestions.length > 0) {
+          const saved = await Question.insertMany(
+            aiQuestions.map((q) => ({
+              questionText: q.questionText,
+              options: q.options,
+              correctOption: q.correctOption,
+              educationLevel,
+              educationStage,
+              stream,                // ✅ REQUIRED
+              subject: s.subject,
+              section: s.section,
+              difficulty,
+              isAIgenerated: true,
+              isActive: true,
+            }))
+          );
+
+          questions.push(...saved);
+        }
       }
 
-      // 5.3 Final safety check
-      if (questions.length < s.totalQuestions) {
-        return res.status(400).json({
-          success: false,
-          message: `Unable to generate enough questions for ${s.subject}`,
+      // 🚨 Final safety check
+      if (questions.length === 0) {
+        return res.status(503).json({
+          message:
+            "Question generation temporarily unavailable. Please try again later.",
         });
       }
 
@@ -203,75 +158,42 @@ export const startTest = async (req, res) => {
       totalQuestions += questions.length;
     }
 
-    // 6️⃣ Create test session
-    const testSession = await TestSession.create({
-      userId,
-      classLevel,
-      stream,
-      level,
-      subjects,
-      questionIds,
-      totalQuestions,
-      durationMinutes: totalQuestions,
-      status: "not_started", // Start as "not_started"
-      createdAt: new Date(),
-    });
+    // 6️⃣ Lock question reuse (ABSOLUTE RULE)
+    user.usedQuestions = [
+      ...new Set([...user.usedQuestions, ...questionIds]),
+    ];
+    await user.save();
 
-    // 7️⃣ Immediately update to "in_progress" with timestamps
-    const updatedSession = await TestSession.findByIdAndUpdate(
-      testSession._id,
-      {
-        status: "in_progress",
-        startedAt: new Date(),
-        endsAt: new Date(Date.now() + totalQuestions * 60 * 1000),
-        lastUpdated: new Date()
-      },
-      { new: true }
-    );
+  // 7️⃣ Create test session (SCHEMA-COMPLETE)
+  const session = await TestSession.create({
+    userId,
+    level,
 
-    // 8️⃣ Fetch questions for response
-    const questions = await Question.find({
-      _id: { $in: questionIds }
-    }).lean();
+    // ✅ REQUIRED BY SCHEMA
+    classLevel: educationLevel,
+    stream,
 
-    console.log(`[StartTest] New test created: ${testSession._id}, level=${level}, questions=${totalQuestions}`);
+    // must contain at least 2 subjects
+    subjects: finalSubjects.map(s => ({
+      section: s.section,
+      subject: s.subject,
+      totalQuestions: s.count,
+    })),
 
-    return res.status(201).json({
-      success: true,
-      testSessionId: testSession._id,
-      level,
-      totalQuestions,
-      durationMinutes: totalQuestions,
-      questions: questions,
-      status: "in_progress",
-      startedAt: updatedSession.startedAt,
-      endsAt: updatedSession.endsAt,
-      testName: `Career Assessment - Level ${level}`,
-      message: "Test started successfully"
-    });
+    questionIds,
+    totalQuestions,
+    durationMinutes: totalQuestions,
+
+    status: "in_progress",
+    startedAt: new Date(),
+    endsAt: new Date(Date.now() + totalQuestions * 60 * 1000),
+  });
 
   } catch (error) {
     console.error("Start Test Error:", error);
-    
-    // Provide more specific error messages
-    let errorMessage = "Complete Your Profile Or Details Insufficient to Start Test";
-    let statusCode = 500;
-    
-    if (error.message.includes("validation") || error.message.includes("Invalid")) {
-      errorMessage = "Invalid user data. Please check your profile details.";
-      statusCode = 400;
-    } else if (error.message.includes("not found") || error.message.includes("undefined")) {
-      errorMessage = "User profile not found or incomplete";
-      statusCode = 404;
-    } else if (error.message.includes("AI") || error.message.includes("generate")) {
-      errorMessage = "Unable to generate questions at this time. Please try again.";
-      statusCode = 503;
-    }
-    
-    res.status(statusCode).json({ 
-      success: false,
-      message: errorMessage,
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    return res.status(500).json({
+      message: "Unable to start test",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };

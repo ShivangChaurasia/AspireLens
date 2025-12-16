@@ -9,6 +9,4 @@ router.post(
   requireAuth,
   generateCareerCounselling
 );
-
 export default router;
- 
