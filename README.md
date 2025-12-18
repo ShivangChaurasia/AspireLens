@@ -353,7 +353,7 @@ SERVER_URL: Backend server URL
 AI_MODEL: Groq model identifier
 
 
-
+```
 📸 ###Screenshots
 ![Dashboard Interface](aspirelens-frontend/public/screenshots/dashboard.png)
 *Modern dashboard with performance overview*
