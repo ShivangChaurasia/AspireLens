@@ -152,63 +152,84 @@ Validation Business Logic Data Persistence Intelligence Layer
 
 ---
 
-## 📂 Project Structure
+# 📁 PROJECT STRUCTURE 
+
 aspirelens/
-├── backend/
-│ ├── controllers/ # Request handlers
-│ │ ├── auth.controller.js
-│ │ ├── test.controller.js
-│ │ ├── result.controller.js
-│ │ └── admin.controller.js
-│ ├── models/ # MongoDB schemas
-│ │ ├── User.js
-│ │ ├── Question.js
-│ │ ├── TestResult.js
-│ │ └── CareerPath.js
-│ ├── routes/ # API endpoints
-│ │ ├── auth.routes.js
-│ │ ├── test.routes.js
-│ │ ├── result.routes.js
-│ │ └── admin.routes.js
-│ ├── services/ # Business logic
-│ │ ├── auth.service.js
-│ │ ├── test.service.js
-│ │ ├── ai.service.js # AI integration layer
-│ │ └── scoring.service.js
-│ ├── middleware/ # Custom middleware
-│ │ ├── auth.middleware.js
-│ │ ├── validation.middleware.js
-│ │ └── error.middleware.js
-│ ├── utils/ # Helper functions
-│ │ ├── validators.js
-│ │ ├── constants.js
-│ │ └── security.js
-│ └── server.js # Application entry point
 │
-├── frontend/
-│ ├── src/
-│ │ ├── components/ # Reusable UI components
-│ │ │ ├── common/
-│ │ │ ├── auth/
-│ │ │ ├── test/
-│ │ │ └── results/
-│ │ ├── pages/ # Route components
-│ │ │ ├── Home/
-│ │ │ ├── Login/
-│ │ │ ├── Dashboard/
-│ │ │ ├── Test/
-│ │ │ └── Results/
-│ │ ├── context/ # React context providers
-│ │ │ └── AuthContext.jsx
-│ │ ├── services/ # API service calls
-│ │ │ └── api.js
-│ │ ├── utils/ # Frontend utilities
-│ │ ├── assets/ # Static assets
-│ │ └── styles/ # Global styles
-│ └── public/ # Static files
+├── 📁 backend/
+│   ├── 📁 controllers/           # Request handlers
+│   │   ├── auth.controller.js
+│   │   ├── test.controller.js
+│   │   ├── result.controller.js
+│   │   └── admin.controller.js
+│   │
+│   ├── 📁 models/                # MongoDB schemas
+│   │   ├── User.js
+│   │   ├── Question.js
+│   │   ├── TestResult.js
+│   │   └── CareerPath.js
+│   │
+│   ├── 📁 routes/                # API endpoints
+│   │   ├── auth.routes.js
+│   │   ├── test.routes.js
+│   │   ├── result.routes.js
+│   │   └── admin.routes.js
+│   │
+│   ├── 📁 services/              # Business logic
+│   │   ├── auth.service.js
+│   │   ├── test.service.js
+│   │   ├── ai.service.js        # AI integration layer
+│   │   └── scoring.service.js
+│   │
+│   ├── 📁 middleware/            # Custom middleware
+│   │   ├── auth.middleware.js
+│   │   ├── validation.middleware.js
+│   │   └── error.middleware.js
+│   │
+│   ├── 📁 utils/                 # Helper functions
+│   │   ├── validators.js
+│   │   ├── constants.js
+│   │   └── security.js
+│   │
+│   └── server.js                # Application entry point
 │
-├── Json-Animation/ # Lottie animation JSON files
-└── README.md # This file
+├── 📁 frontend/
+│   ├── 📁 src/
+│   │   ├── 📁 components/        # Reusable UI components
+│   │   │   ├── 📁 common/
+│   │   │   ├── 📁 auth/
+│   │   │   ├── 📁 test/
+│   │   │   └── 📁 results/
+│   │   │
+│   │   ├── 📁 pages/            # Route components
+│   │   │   ├── Home/
+│   │   │   ├── Login/
+│   │   │   ├── Dashboard/
+│   │   │   ├── Test/
+│   │   │   └── Results/
+│   │   │
+│   │   ├── 📁 context/          # React context providers
+│   │   │   └── AuthContext.jsx
+│   │   │
+│   │   ├── 📁 services/         # API service calls
+│   │   │   └── api.js
+│   │   │
+│   │   ├── 📁 utils/            # Frontend utilities
+│   │   │
+│   │   ├── 📁 assets/           # Static assets (images, icons)
+│   │   │
+│   │   └── 📁 styles/           # Global styles
+│   │
+│   └── 📁 public/               # Static files (favicon, index.html)
+│
+├── 📁 Json-Animation/           # Lottie animation JSON files
+│   ├── AdminAuth.json
+│   ├── Login.json
+│   ├── SightUp.json
+│   ├── success.json
+│   └── Dashboard_screen.json
+│
+└── 📄 README.md                 # Project documentation
 
 ---
 
