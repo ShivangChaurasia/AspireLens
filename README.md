@@ -154,6 +154,7 @@ Validation Business Logic Data Persistence Intelligence Layer
 
 # 📁 PROJECT STRUCTURE 
 
+```bash
 .
 |-- README.md
 |-- aspirelens-backend
