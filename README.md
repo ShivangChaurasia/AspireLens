@@ -368,7 +368,7 @@ AI_MODEL: Groq model identifier
 *Administrative interface for content management*
 
 
-
+```bash
 🚢 Deployment
 Frontend Deployment (Vercel/Netlify)
 bash
@@ -410,43 +410,7 @@ Set NODE_ENV=production
 Enable CORS for your frontend domain
 
 Configure rate limiting appropriately
-
-🗺️ Roadmap
-Phase 1: Foundation (Current)
-✅ Core aptitude test system
-
-✅ Basic AI recommendations
-
-✅ User authentication
-
-✅ Responsive UI
-
-Phase 2: Enhancement (Q2 2024)
-🔄 Advanced analytics dashboard
-
-🔄 Multi-language support
-
-🔄 Exportable career reports
-
-🔄 Mobile application (React Native)
-
-Phase 3: Expansion (Q3 2024)
-📅 Industry partnership integrations
-
-📅 Advanced AI model fine-tuning
-
-📅 Collaborative features for counselors
-
-📅 Gamification elements
-
-Phase 4: Enterprise (Q4 2024)
-📅 Institutional licensing
-
-📅 Custom assessment creation
-
-📅 API access for third-party integration
-
-📅 Advanced data visualization tools
+```
 
 🤝 Contributing
 We welcome contributions that align with AspireLens's core principles:
