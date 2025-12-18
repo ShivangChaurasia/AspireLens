@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const userAnswerSchema = new mongoose.Schema(
   {
-    // Link to user
+    // 🔗 User
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -10,7 +10,7 @@ const userAnswerSchema = new mongoose.Schema(
       index: true,
     },
 
-    // Link to test session
+    // 🔗 Test session
     testSessionId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "TestSession",
@@ -18,25 +18,26 @@ const userAnswerSchema = new mongoose.Schema(
       index: true,
     },
 
-    // Link to question
+    // 🔗 Question
     questionId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Question",
       required: true,
+      index: true,
     },
 
-    // Question context (denormalized for fast analytics)
+    // 📘 Context (denormalized – REQUIRED)
     subject: {
-      type: String, // "Verbal Ability", "Computer Science"
+      type: String,
       required: true,
     },
 
     section: {
-      type: String, // "verbal", "analytical", "domain"
+      type: String,
       required: true,
     },
 
-    // User response
+    // 📝 Answer metadata
     answerType: {
       type: String,
       enum: ["mcq", "short", "essay"],
@@ -44,19 +45,19 @@ const userAnswerSchema = new mongoose.Schema(
     },
 
     selectedOption: {
-      type: String, // "A", "B", "C", "D" (MCQ)
+      type: String,
       default: null,
     },
 
     answerText: {
-      type: String, // Short / descriptive answers
+      type: String,
       default: null,
     },
 
-    // Evaluation (filled after submission)
+    // ✅ Evaluation
     isCorrect: {
       type: Boolean,
-      default: null, // null until evaluated
+      default: null,
     },
 
     marksAwarded: {
@@ -74,15 +75,14 @@ const userAnswerSchema = new mongoose.Schema(
       default: 1,
     },
 
-
-    // AI evaluation metadata
+    // 🤖 AI feedback (optional)
     aiEvaluation: {
       score: { type: Number, default: null },
       feedback: { type: String, default: null },
       improvementTip: { type: String, default: null },
     },
 
-    // Timing
+    // ⏱ Timing
     timeSpentSeconds: {
       type: Number,
       default: 0,
@@ -97,21 +97,26 @@ const userAnswerSchema = new mongoose.Schema(
 );
 
 /**
- * Prevent duplicate answers per question per test
+ * 🛡 DATA SANITY HOOK
  */
+userAnswerSchema.pre("save", function () {
+  // absolute safety
+  if (!this.subject) this.subject = "General";
+  if (!this.section) this.section = "general";
 
-userAnswerSchema.pre("save", function (next) {
   if (this.answerType === "mcq") {
     this.answerText = null;
-  }
-  if (this.answerType !== "mcq") {
+  } else {
     this.selectedOption = null;
   }
-  next();
 });
 
+/**
+ * 🔒 HARD GUARANTEE
+ * A user can NEVER see the same question twice
+ */
 userAnswerSchema.index(
-  { userId: 1, testSessionId: 1, questionId: 1 },
+  { userId: 1, questionId: 1 },
   { unique: true }
 );
 

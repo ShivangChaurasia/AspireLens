@@ -1,5 +1,9 @@
 import mongoose from "mongoose";
+import crypto from "crypto";
 
+/**
+ * OPTION SCHEMA
+ */
 const optionSchema = new mongoose.Schema(
   {
     label: { type: String, required: true },
@@ -8,6 +12,9 @@ const optionSchema = new mongoose.Schema(
   { _id: false }
 );
 
+/**
+ * QUESTION SCHEMA
+ */
 const questionSchema = new mongoose.Schema(
   {
     // ✅ MATCHES USER PROFILE
@@ -37,7 +44,7 @@ const questionSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
-
+ 
     questionType: {
       type: String,
       enum: ["mcq", "short", "situational", "likert"],
@@ -47,6 +54,13 @@ const questionSchema = new mongoose.Schema(
     questionText: {
       type: String,
       required: true,
+    },
+
+    // 🔒 CRITICAL: CONTENT-BASED DEDUPLICATION
+    questionHash: {
+      type: String,
+      required: true,
+      index: true,
     },
 
     options: {
@@ -84,14 +98,43 @@ const questionSchema = new mongoose.Schema(
 );
 
 /**
- * SMART INDEXES
+ * 🔐 AUTO-GENERATE HASH BEFORE SAVE
  */
-questionSchema.index({
-  educationLevel: 1,
-  educationStage: 1,
-  stream: 1,
-  section: 1,
-  difficulty: 1,
+questionSchema.pre("validate", function () {
+  if (!this.questionHash && this.questionText) {
+    this.questionHash = crypto
+      .createHash("sha256")
+      .update(this.questionText.trim().toLowerCase())
+      .digest("hex");
+  }
 });
+
+/**
+ * 🚀 SMART INDEXES
+ */
+questionSchema.index(
+  {
+    questionHash: 1,
+    educationLevel: 1,
+    section: 1,
+    subject: 1,
+  },
+  { unique: true }
+);
+
+
+/**
+ * 🔥 HARD DUPLICATE PREVENTION
+ * Same question text cannot exist twice in same context
+ */
+questionSchema.index(
+  {
+    questionHash: 1,
+    educationLevel: 1,
+    section: 1,
+    subject: 1,
+  },
+  { unique: true }
+);
 
 export default mongoose.model("Question", questionSchema);

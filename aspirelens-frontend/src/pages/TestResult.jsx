@@ -1,5 +1,6 @@
 // src/pages/TestResult.jsx
 import { useEffect, useState } from "react";
+import { Save, AlertTriangle, Home as HomeIcon } from 'lucide-react';
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
@@ -29,6 +30,8 @@ export default function TestResult() {
   const [error, setError] = useState("");
   const [result, setResult] = useState(null);
   const [downloading, setDownloading] = useState(false);
+  const [showExitWarning, setShowExitWarning] = useState(false);
+  const [targetExitPath, setTargetExitPath] = useState("");
 
   const getToken = () => localStorage.getItem("token");
 
@@ -176,6 +179,81 @@ export default function TestResult() {
 
   // Check if pending evaluation
   const isPending = result?.status === "pending_evaluation";
+
+  const handleExitWithWarning = (path) => {
+    setTargetExitPath(path);
+    setShowExitWarning(true);
+  };
+
+  const handleExitConfirm = () => {
+    setShowExitWarning(false);
+    navigate(targetExitPath);
+  };
+
+  const handleExitCancel = () => {
+    setShowExitWarning(false);
+    setTargetExitPath("");
+  };
+
+  const ExitWarningModal = () => (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-fadeIn">
+        <div className="flex items-center mb-4">
+          <div className="h-12 w-12 bg-amber-100 rounded-full flex items-center justify-center mr-4">
+            <AlertTriangle className="h-6 w-6 text-amber-600" />
+          </div>
+          <div>
+            <h3 className="text-xl font-bold text-gray-900">Save Test Result?</h3>
+            <p className="text-gray-600 text-sm mt-1">Your performance analysis</p>
+          </div>
+        </div>
+        
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
+          <p className="text-amber-800 font-medium flex items-center">
+            <Save className="h-4 w-4 mr-2" />
+            Important Recommendation
+          </p>
+          <p className="text-amber-700 text-sm mt-2">
+            Before exiting, please save your detailed test result report. 
+            This contains your performance analytics, section scores, and AI insights.
+          </p>
+        </div>
+        
+        <p className="text-gray-700 mb-6">
+          Are you sure you don't want to save the report before leaving this page?
+        </p>
+        
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button
+            onClick={handleExitCancel}
+            className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-colors"
+          >
+            Cancel & Stay
+          </button>
+          <button
+            onClick={handleDownloadPDF}
+            disabled={downloading || isPending}
+            className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-colors flex items-center justify-center disabled:opacity-50"
+          >
+            {downloading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <>
+                <Download className="h-4 w-4 mr-2" />
+                Save PDF
+              </>
+            )}
+          </button>
+          <button
+            onClick={handleExitConfirm}
+            className="flex-1 px-4 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold rounded-xl hover:from-amber-600 hover:to-orange-600 transition-colors"
+          >
+            Exit Anyway
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50/30 p-4 md:p-6">
@@ -483,15 +561,15 @@ export default function TestResult() {
                 </button>
 
                 <button
-                  onClick={() => navigate("/dashboard")}
+                  onClick={() => handleExitWithWarning("/dashboard")}
                   className="w-full px-4 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
                 >
-                  <Home className="h-5 w-5" />
+                  <HomeIcon className="h-5 w-5" />
                   Go to Dashboard
                 </button>
 
                 <button
-                  onClick={() => navigate(`/counselling/${testSessionId}`)}
+                  onClick={() => handleExitWithWarning(`/counselling/${testSessionId}`)}
                   className="w-full px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-xl hover:from-green-700 hover:to-emerald-700 transition-colors flex items-center justify-center gap-2"
                 >
                   <Users className="h-5 w-5" />
@@ -506,6 +584,7 @@ export default function TestResult() {
                   View Submission
                 </button>
               </div>
+              {showExitWarning && <ExitWarningModal />}
             </div>
 
             {/* Important Notes */}

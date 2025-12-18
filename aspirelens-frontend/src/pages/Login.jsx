@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect, useContext } from 'react'; // ✅ Added useEffect
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useContext } from 'react';
 import AuthContext from '../context/AuthContext';
 
 export default function Login() {
@@ -14,7 +13,28 @@ export default function Login() {
     rememberMe: false
   });
   const { setUser } = useContext(AuthContext);
+  const [LottieComponent, setLottieComponent] = useState(null);
+  const [animationData, setAnimationData] = useState(null);
 
+  useEffect(() => {
+    // Load Lottie component
+    import('lottie-react')
+      .then(module => {
+        setLottieComponent(() => module.default);
+      })
+      .catch(error => {
+        console.warn('Failed to load lottie-react:', error);
+      });
+
+    // Load animation data
+    import('../Json-Animation/Login.json') // Changed to Login.json for login page
+      .then(module => {
+        setAnimationData(module.default);
+      })
+      .catch(error => {
+        console.warn('Failed to load animation:', error);
+      });
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,10 +60,10 @@ export default function Login() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-white flex items-center justify-center p-4">
       <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
 
-        {/* Left Side - Brand/Info */}
+        {/* Left Side - Brand/Info with Animation */}
         <div className="hidden lg:block">
-          <div className="max-w-lg">
-            <div className="flex items-center mb-8">
+          <div className="max-w-xl">
+            <div className="flex items-center mb-2">
               <div className="h-12 w-12 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center mr-4">
                 <span className="text-white text-2xl">🔭</span>
               </div>
@@ -52,18 +72,53 @@ export default function Login() {
               </h1>
             </div>
 
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">
+            <h2 className="text-4xl font-bold text-gray-900">
               See Your World
               <span className="block text-blue-600">More Clearly</span>
             </h2>
 
-            <p className="text-gray-600 text-lg mb-10">
+            <p className="text-gray-600 text-lg">
               Access personalized insights, smart analytics, and tools that help you navigate your educational journey with precision.
             </p>
 
+            {/* Animation Container */}
+            {/* <div className="mb-10 bg-gradient-to-br from-cyan-50 to-blue-50 rounded-3xl p-6 border border-cyan-100 shadow-lg">
+              <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">
+                Welcome Experience
+              </h3> */}
+              <div className=" mr-">
+                {LottieComponent && animationData ? (
+                  <LottieComponent
+                    animationData={animationData}
+                    loop={true}
+                    autoplay={true}
+                    style={{ width: '100%', maxWidth: 700, height: 550 }}
+                    rendererSettings={{
+                      preserveAspectRatio: 'xMidYMid meet'
+                    }}
+                  />
+                ) : (
+                  <div className="text-center py-8">
+                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-cyan-500/20 to-blue-500/20 mb-4">
+                      <span className="text-4xl">🔭</span>
+                    </div>
+                    <h4 className="text-lg font-bold text-gray-800 mb-2">Loading Interactive Experience</h4>
+                    <p className="text-gray-600 text-sm max-w-md">
+                      Preparing your personalized login experience...
+                    </p>
+                    <div className="flex justify-center space-x-2 mt-4">
+                      <div className="h-2 w-2 bg-cyan-500 rounded-full animate-pulse"></div>
+                      <div className="h-2 w-2 bg-blue-500 rounded-full animate-pulse delay-75"></div>
+                      <div className="h-2 w-2 bg-purple-500 rounded-full animate-pulse delay-150"></div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            {/* </div> */}
+
             {/* Features */}
             <div className="space-y-6">
-              <div className="flex items-center">
+              {/* <div className="flex items-center">
                 <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-4">
                   <span className="text-blue-600">🎯</span>
                 </div>
@@ -91,7 +146,7 @@ export default function Login() {
                   <h4 className="font-semibold text-gray-900">Secure & Private</h4>
                   <p className="text-gray-500 text-sm">Your data is always protected</p>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -181,17 +236,17 @@ export default function Login() {
             </button>
 
             {/* Divider */}
-            <div className="relative my-8">
+            {/* <div className="relative my-8">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300"></div>
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="px-4 bg-white text-gray-500">Or continue with</span>
               </div>
-            </div>
+            </div> */}
 
             {/* Social Login */}
-            <div className="grid grid-cols-2 gap-4">
+            {/* <div className="grid grid-cols-2 gap-4">
               <button
                 type="button"
                 className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
@@ -213,7 +268,7 @@ export default function Login() {
                 </svg>
                 GitHub
               </button>
-            </div>
+            </div> */}
 
             {/* Sign Up Link */}
             <div className="text-center pt-6">

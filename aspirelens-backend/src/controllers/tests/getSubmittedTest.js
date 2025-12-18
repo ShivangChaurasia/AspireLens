@@ -1,7 +1,10 @@
+// controllers/tests/getSubmittedTest.js
+import TestResult from "../../models/TestResults.js";
 import TestSession from "../../models/TestSessions.js";
+import User from "../../models/User.js";
 
 /**
- * GET SUBMITTED TEST DETAILS
+ * GET SUBMITTED TEST CONTROLLER (alias for getTestResult)
  * GET /api/test/submitted/:testSessionId
  */
 export const getSubmittedTest = async (req, res) => {
@@ -9,53 +12,118 @@ export const getSubmittedTest = async (req, res) => {
     const { testSessionId } = req.params;
     const userId = req.user.id;
 
-    // 🔍 Find test session
-    const session = await TestSession.findOne({
+    console.log(`[GetSubmittedTest] Request: session=${testSessionId}, user=${userId}`);
+
+    // 1️⃣ Validate testSessionId format
+    if (!testSessionId.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid test session ID format"
+      });
+    }
+
+    // 2️⃣ Check test session exists and belongs to user
+    const testSession = await TestSession.findOne({
       _id: testSessionId,
+      userId
+    }).select("status submittedAt totalQuestions level testName");
+
+    if (!testSession) {
+      return res.status(404).json({
+        success: false,
+        message: "Test session not found or unauthorized"
+      });
+    }
+
+    // 3️⃣ Find test result
+    const testResult = await TestResult.findOne({
+      testSessionId,
       userId
     });
 
-    if (!session) {
-      return res.status(404).json({
-        message: "Test session not found"
+    if (!testResult) {
+      return res.status(200).json({
+        success: true,
+        testSessionId,
+        status: "pending_evaluation",
+        message: "Test is being evaluated",
+        testName: testSession.testName || `Career Assessment - Level ${testSession.level || 1}`,
+        level: testSession.level || 1,
+        totalQuestions: testSession.totalQuestions || 0,
+        attemptedQuestions: 0,
+        correctAnswers: 0,
+        wrongAnswers: 0,
+        scorePercentage: 0,
+        sectionWiseScore: {},
+        submittedAt: testSession.submittedAt,
+        evaluatedAt: null
       });
     }
 
-    // ❌ Block access if not submitted
-    if (session.status !== "submitted" && session.status) {
-      return res.status(400).json({
-        message: "Test not submitted yet"
-      });
-    }
+    // 4️⃣ Calculate derived fields
+    const unattemptedQuestions = Math.max(
+      0,
+      testResult.totalQuestions - testResult.attemptedQuestions
+    );
 
-    // 📊 Calculate attempted / unattempted
-    const totalQuestions = session.totalQuestions || 0;
+    const accuracy =
+      testResult.attemptedQuestions > 0
+        ? Math.round(
+            (testResult.correctAnswers / testResult.attemptedQuestions) * 100
+          )
+        : 0;
 
-    // If later you store answers separately, this remains future-safe
-    const attempted =
-      session.answers?.length ||
-      session.scoreSummary?.attempted ||
-      0;
+    // 5️⃣ Get user details
+    const user = await User.findById(userId).select(
+      "firstName lastName email profile"
+    );
 
-    const unattempted = Math.max(totalQuestions - attempted, 0);
+    // 6️⃣ Prepare response
+    const response = {
+      success: true,
+      testSessionId: testResult.testSessionId,
+      status: testResult.status,
+      testName:
+        testSession.testName ||
+        `Career Assessment - Level ${testSession.level || 1}`,
+      level: testSession.level || 1,
+      totalQuestions: testResult.totalQuestions,
+      attemptedQuestions: testResult.attemptedQuestions,
+      unattemptedQuestions,
+      correctAnswers: testResult.correctAnswers,
+      wrongAnswers: testResult.wrongAnswers,
+      scorePercentage: testResult.scorePercentage,
+      accuracyPercentage: accuracy,
+      sectionWiseScore: Object.fromEntries(testResult.sectionWiseScore || {}),
+      submittedAt: testSession.submittedAt,
+      evaluatedAt: testResult.evaluatedAt,
 
-    return res.json({
-      testSessionId: session._id,
-      status: session.status,
-      submittedAt: session.submittedAt,
-      totalQuestions,
-      attempted,
-      unattempted,
-      durationMinutes: session.durationMinutes,
-      level: session.level,
-      scoreSummary: session.scoreSummary || null,
-      aiInsights: session.aiInsights || null
-    });
+      // User details
+      userDetails: {
+        name: `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "User",
+        email: user?.email || "N/A",
+        educationLevel: user?.profile?.educationLevel || "N/A",
+        educationStage: user?.profile?.educationStage || "N/A",
+        interests: user?.profile?.interests || []
+      }
+    };
+
+    console.log(
+      `[GetSubmittedTest] Success: session=${testSessionId}, status=${testResult.status}`
+    );
+
+    return res.status(200).json(response);
 
   } catch (error) {
-    console.error("Get Submitted Test Error:", error);
+    console.error("[GetSubmittedTest] Error:", error);
+
     return res.status(500).json({
-      message: "Failed to fetch submitted test"
+      success: false,
+      message: "Failed to fetch submitted test",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : undefined
     });
   }
 };

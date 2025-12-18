@@ -6,16 +6,10 @@ import {
   AlertCircle,
   Loader2,
   ListChecks,
-  Calendar,
-  Trophy,
-  Brain,
-  TrendingUp,
   Shield,
   BarChart,
-  Target,
   Award,
-  Clock,
-  Users
+  Clock
 } from "lucide-react";
 
 export default function TestSubmitted() {
@@ -63,18 +57,26 @@ export default function TestSubmitted() {
         const summaryData = {
           testSessionId: data.testSessionId,
           status: data.status,
-          submittedAt: data.submittedAt || new Date().toISOString(),
-          autoSubmitted: autoSubmitted,
-          autoSubmitReason: reason,
+          submittedAt: data.submittedAt,
+          evaluatedAt: data.evaluatedAt,
+        
           totalQuestions: data.totalQuestions || 0,
-          attempted: data.attempted || 0,
-          unattempted: data.unattempted || 0,
-          durationMinutes: data.durationMinutes || 0,
+          attempted: data.attemptedQuestions || 0,
+          unattempted: data.unattemptedQuestions || 0,
+        
           level: data.level || 1,
-          scoreSummary: data.scoreSummary || null,
-          aiInsights: data.aiInsights || null,
-          hasErrors: networkError || serverError
+        
+          scoreSummary: {
+            scorePercentage: data.scorePercentage,
+            accuracyPercentage: data.accuracyPercentage,
+            correctAnswers: data.correctAnswers,
+            wrongAnswers: data.wrongAnswers,
+            sectionWiseScore: data.sectionWiseScore || {},
+          },
+        
+          userDetails: data.userDetails || null,
         };
+
 
         // If we have data from submission, merge it
         if (submittedData) {

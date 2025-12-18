@@ -1,4 +1,3 @@
-// src/controllers/tests/submitTest.js
 
 import TestSession from "../../models/TestSessions.js";
 import TestResult from "../../models/TestResults.js";
@@ -33,7 +32,7 @@ export const submitTest = async (req, res) => {
     }
 
     // 4️⃣ Idempotency
-    if (testSession.status === "submitted" || testSession.status === "evaluated") {
+    if (["submitted", "evaluated"].includes(testSession.status)) {
       const existingResult = await TestResult.findOne({ testSessionId, userId });
       return res.json({
         success: true,
@@ -44,27 +43,46 @@ export const submitTest = async (req, res) => {
       });
     }
 
-    // 5️⃣ Fetch answers
+    // 5️⃣ Fetch answers with questions
     const answers = await UserAnswer.find({
       testSessionId,
       userId,
     }).populate("questionId");
 
-    // 6️⃣ MCQ AUTO EVALUATION
     let correctAnswers = 0;
     let wrongAnswers = 0;
     let attemptedQuestions = 0;
+    
+    // ✅ FIX: Initialize sectionWiseScore as an object with proper structure
     let sectionWiseScore = {};
+    
+    // First, gather section totals
+    const sectionTotals = {};
+    const sectionCorrects = {};
 
+    // 6️⃣ MCQ AUTO EVALUATION
     for (const ans of answers) {
       const question = ans.questionId;
       if (!question || question.questionType !== "mcq") continue;
+
+      // Initialize section counters
+      if (!sectionTotals[question.section]) {
+        sectionTotals[question.section] = 0;
+        sectionCorrects[question.section] = 0;
+      }
+      
+      sectionTotals[question.section]++;
+
+      // 🔧 Backfill required fields
+      if (!ans.section) ans.section = question.section;
+      if (!ans.subject) ans.subject = question.subject;
 
       if (ans.selectedOption && ans.selectedOption.trim() !== "") {
         attemptedQuestions++;
 
         if (ans.selectedOption === question.correctOption) {
           correctAnswers++;
+          sectionCorrects[question.section]++;
           ans.isCorrect = true;
           ans.marksAwarded = 1;
         } else {
@@ -73,20 +91,32 @@ export const submitTest = async (req, res) => {
           ans.marksAwarded = 0;
         }
 
-        sectionWiseScore[question.section] =
-          (sectionWiseScore[question.section] || 0) + ans.marksAwarded;
-
         await ans.save();
       }
     }
 
+    // ✅ FIX: Build sectionWiseScore with proper object structure
+    for (const section in sectionTotals) {
+      const correct = sectionCorrects[section] || 0;
+      const total = sectionTotals[section];
+      const percentage = total > 0 ? Math.round((correct / total) * 100) : 0;
+      
+      sectionWiseScore[section] = {
+        correct,
+        total,
+        percentage
+      };
+    }
+
+    // ✅ FIX: DEFINE totalQuestions HERE
     const totalQuestions = testSession.totalQuestions || 0;
+
     const scorePercentage =
-      attemptedQuestions > 0
+      totalQuestions > 0
         ? Math.round((correctAnswers / totalQuestions) * 100)
         : 0;
 
-    // 7️⃣ Create or update TestResult
+    // 7️⃣ Create / Update TestResult
     const testResult = await TestResult.findOneAndUpdate(
       { testSessionId, userId },
       {
@@ -97,7 +127,7 @@ export const submitTest = async (req, res) => {
         correctAnswers,
         wrongAnswers,
         scorePercentage,
-        sectionWiseScore,
+        sectionWiseScore, // ✅ Now this has the correct structure
         status: "evaluated",
         evaluatedAt: new Date(),
         autoSubmitted: Boolean(reason),
@@ -115,7 +145,7 @@ export const submitTest = async (req, res) => {
       lastUpdated: new Date(),
     });
 
-    // 9️⃣ Update user activity (safe)
+    // 9️⃣ Update user stats
     await User.findByIdAndUpdate(userId, {
       $inc: { "profile.testsTaken": 1 },
       $set: { "profile.lastActive": new Date() },

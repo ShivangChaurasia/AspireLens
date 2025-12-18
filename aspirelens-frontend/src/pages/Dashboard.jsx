@@ -322,7 +322,7 @@ export default function Dashboard() {
                   <Target className="h-7 w-7 text-white" />
                 </div>
                 <span className="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">
-                  {testsTaken > 0 ? "Ready" : "Take Test First"}
+                  {testsTaken > 0 ? "Coming Soon" : "Coming Soon"}
                 </span>
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-3">
@@ -333,8 +333,8 @@ export default function Dashboard() {
               </p>
               
               {testsTaken > 0 ? (
-                <button className="w-full px-6 py-3 bg-gradient-to-r from-amber-600 to-orange-600 text-white font-semibold rounded-xl hover:from-amber-700 hover:to-orange-700 transform hover:-translate-y-0.5 transition-all duration-300 shadow-lg hover:shadow-xl">
-                  View Goals
+                <button className="mt-6 w-full px-6 py-3 bg-gradient-to-r from-orange-300 to-orange-300 text-white font-semibold rounded-xl hover:from-amber-700 hover:to-orange-700 transform hover:-translate-y-0.5 transition-all duration-300 shadow-lg hover:shadow-xl">
+                  Coming Soon
                 </button>
               ) : (
                 <div className="text-sm text-gray-500 bg-gray-50 p-3 rounded-lg border border-gray-200">

@@ -1,13 +1,10 @@
-// src/controllers/tests/evaluateTest.js
-
 import TestSession from "../../models/TestSessions.js";
 import TestResult from "../../models/TestResults.js";
 import UserAnswer from "../../models/UserAnswer.js";
-import Question from "../../models/Question.js";
 
 /**
  * EVALUATE TEST (MCQ AUTO EVALUATION)
- * Can be triggered after submission
+ * POST /api/test/evaluate/:testSessionId
  */
 export const evaluateTest = async (req, res) => {
   try {
@@ -17,6 +14,7 @@ export const evaluateTest = async (req, res) => {
     const session = await TestSession.findById(testSessionId);
     if (!session || session.status !== "submitted") {
       return res.status(400).json({
+        success: false,
         message: "Test session not ready for evaluation",
       });
     }
@@ -25,75 +23,87 @@ export const evaluateTest = async (req, res) => {
     const result = await TestResult.findOne({ testSessionId });
     if (!result) {
       return res.status(404).json({
+        success: false,
         message: "Test result not found",
       });
     }
 
-    // Prevent double evaluation
     if (result.status === "evaluated") {
       return res.status(200).json({
+        success: true,
         message: "Test already evaluated",
         resultId: result._id,
       });
     }
 
-    // 3️⃣ Fetch answers
-    const answers = await UserAnswer.find({ testSessionId });
+    // 3️⃣ Fetch answers WITH questions
+    const answers = await UserAnswer.find({ testSessionId })
+      .populate("questionId");
+
     if (!answers.length) {
       return res.status(400).json({
+        success: false,
         message: "No answers found for evaluation",
       });
     }
 
-    let correct = 0;
-    let wrong = 0;
-    let attempted = 0;
+    let correctAnswers = 0;
+    let wrongAnswers = 0;
+    let attemptedQuestions = 0;
 
     const sectionWiseScore = {};
 
     // 4️⃣ Evaluate MCQs
     for (const ans of answers) {
-      if (!ans.questionId || !ans.selectedOption) continue;
+      const question = ans.questionId;
+      if (!question || question.questionType !== "mcq") continue;
 
-      const question = await Question.findById(ans.questionId);
-      if (!question) continue;
+      if (!ans.selectedOption) continue;
 
-      attempted++;
+      attemptedQuestions++;
 
-      // Initialize section score
+      // Initialize section
       if (!sectionWiseScore[question.section]) {
         sectionWiseScore[question.section] = {
           correct: 0,
-          wrong: 0,
           total: 0,
+          percentage: 0,
         };
       }
 
       sectionWiseScore[question.section].total++;
 
-      if (
-        question.questionType === "mcq" &&
-        ans.selectedOption === question.correctOption
-      ) {
-        correct++;
+      if (ans.selectedOption === question.correctOption) {
+        correctAnswers++;
+        ans.isCorrect = true;
+        ans.marksAwarded = 1;
         sectionWiseScore[question.section].correct++;
       } else {
-        wrong++;
-        sectionWiseScore[question.section].wrong++;
+        wrongAnswers++;
+        ans.isCorrect = false;
+        ans.marksAwarded = 0;
       }
+
+      await ans.save();
     }
 
-    // 5️⃣ Calculate score
-    const totalQuestions = session.totalQuestions;
+    // 5️⃣ Calculate section percentages
+    for (const section in sectionWiseScore) {
+      const s = sectionWiseScore[section];
+      s.percentage =
+        s.total > 0 ? Math.round((s.correct / s.total) * 100) : 0;
+    }
+
+    const totalQuestions = session.totalQuestions || 0;
     const scorePercentage =
       totalQuestions > 0
-        ? Math.round((correct / totalQuestions) * 100)
+        ? Math.round((correctAnswers / totalQuestions) * 100)
         : 0;
 
     // 6️⃣ Update TestResult
-    result.attemptedQuestions = attempted;
-    result.correctAnswers = correct;
-    result.wrongAnswers = wrong;
+    result.attemptedQuestions = attemptedQuestions;
+    result.correctAnswers = correctAnswers;
+    result.wrongAnswers = wrongAnswers;
     result.totalQuestions = totalQuestions;
     result.scorePercentage = scorePercentage;
     result.sectionWiseScore = sectionWiseScore;
@@ -102,14 +112,20 @@ export const evaluateTest = async (req, res) => {
 
     await result.save();
 
+    // 7️⃣ Update TestSession
+    session.status = "evaluated";
+    session.lastUpdated = new Date();
+    await session.save();
+
     return res.status(200).json({
+      success: true,
       message: "Test evaluated successfully",
       testSessionId,
       summary: {
         totalQuestions,
-        attempted,
-        correct,
-        wrong,
+        attemptedQuestions,
+        correctAnswers,
+        wrongAnswers,
         scorePercentage,
         sectionWiseScore,
       },
@@ -118,6 +134,7 @@ export const evaluateTest = async (req, res) => {
   } catch (error) {
     console.error("Test Evaluation Error:", error);
     return res.status(500).json({
+      success: false,
       message: "Failed to evaluate test",
     });
   }

@@ -2,11 +2,11 @@ import { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
 import { 
-  User, 
-  Mail, 
-  Calendar, 
-  GraduationCap, 
-  BookOpen, 
+  User,
+  Mail,
+  Calendar,
+  GraduationCap,
+  BookOpen,
   Target,
   Edit3,
   CheckCircle,
@@ -923,27 +923,34 @@ export default function MyProfile() {
         {/* --------------------------- */}
         {/* 4. Footer Actions */}
         {/* --------------------------- */}
-        <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl p-6 border border-blue-200">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-xl bg-gradient-to-r from-blue-100 to-cyan-100 flex items-center justify-center">
-                <Upload className="h-6 w-6 text-blue-600" />
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-900">Export Your Data</h4>
-                <p className="text-gray-600 text-sm">Download your profile data and activity history</p>
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <button className="px-6 py-3 bg-white text-blue-600 font-semibold rounded-xl border border-blue-200 hover:bg-blue-50 transition-colors">
-                Download Report
-              </button>
-              <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-700 transform hover:-translate-y-0.5 transition-all duration-300 shadow-lg hover:shadow-xl">
-                Share Profile
-              </button>
-            </div>
+        <div className="border-2 rounded-lg flex space-x-4 p-4 border-red-500">
+          <X></X>
+          <div>
+            <h4 className="font-bold text-red-500">Want to Delete Account?</h4>
+            <p className="text-gray-600 text-sm">Contact <a className="underline text-blue-500">careerwith.aspirelens@gmail.com</a></p>
           </div>
         </div>
+          {/* <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl p-6 border border-blue-200">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-xl bg-gradient-to-r from-blue-100 to-cyan-100 flex items-center justify-center">
+                  <Upload className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900">Export Your Data</h4>
+                    <p className="text-gray-600 text-sm">Download your profile data and activity history</p>
+                  </div>
+              </div>
+              <div className="flex gap-3">
+                <button className="px-6 py-3 bg-white text-blue-600 font-semibold rounded-xl border border-blue-200 hover:bg-blue-50 transition-colors">
+                  Download Report
+                </button>
+                <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-700 transform hover:-translate-y-0.5 transition-all duration-300 shadow-lg hover:shadow-xl">
+                  Share Profile
+                </button>
+              </div>
+            </div>
+          </div> */}
       </div>
     </div>
   );

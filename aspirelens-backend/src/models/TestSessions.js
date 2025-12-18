@@ -142,6 +142,44 @@ const testSessionSchema = new mongoose.Schema(
       careerRecommendations: [String],
       improvementPlan: String,
     },
+    aiInsights: {
+      strengths: {
+        type: [String],
+        default: [],
+      },
+    
+      weaknesses: {
+        type: [String],
+        default: [],
+      },
+    
+      developingAreas: {
+        type: [String],
+        default: [],
+      },
+    
+      careerRecommendations: {
+        type: [
+          {
+            career: { type: String },
+            reason: { type: String },
+            suitabilityLevel: { type: String },
+          },
+        ],
+        default: [],
+      },
+    
+      improvementPlan: {
+        type: [String], // 🔥 FIXED (was String earlier)
+        default: [],
+      },
+    
+      nextTestAdvice: {
+        type: String,
+        default: "",
+      },
+    }
+
   },
   { timestamps: true }
 );

@@ -49,7 +49,7 @@ const WelcomePage = () => {
             </span>
             <br />
             <span className="text-4xl md:text-5xl">
-              {userName || 'Valued Visitor'}!
+              {userName || 'One Word that Defines You!!'}!
             </span>
           </h1>
 
