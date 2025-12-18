@@ -154,82 +154,110 @@ Validation Business Logic Data Persistence Intelligence Layer
 
 # 📁 PROJECT STRUCTURE 
 
-aspirelens/
-│
-├── 📁 backend/
-│   ├── 📁 controllers/           # Request handlers
-│   │   ├── auth.controller.js
-│   │   ├── test.controller.js
-│   │   ├── result.controller.js
-│   │   └── admin.controller.js
-│   │
-│   ├── 📁 models/                # MongoDB schemas
-│   │   ├── User.js
-│   │   ├── Question.js
-│   │   ├── TestResult.js
-│   │   └── CareerPath.js
-│   │
-│   ├── 📁 routes/                # API endpoints
-│   │   ├── auth.routes.js
-│   │   ├── test.routes.js
-│   │   ├── result.routes.js
-│   │   └── admin.routes.js
-│   │
-│   ├── 📁 services/              # Business logic
-│   │   ├── auth.service.js
-│   │   ├── test.service.js
-│   │   ├── ai.service.js        # AI integration layer
-│   │   └── scoring.service.js
-│   │
-│   ├── 📁 middleware/            # Custom middleware
-│   │   ├── auth.middleware.js
-│   │   ├── validation.middleware.js
-│   │   └── error.middleware.js
-│   │
-│   ├── 📁 utils/                 # Helper functions
-│   │   ├── validators.js
-│   │   ├── constants.js
-│   │   └── security.js
-│   │
-│   └── server.js                # Application entry point
-│
-├── 📁 frontend/
-│   ├── 📁 src/
-│   │   ├── 📁 components/        # Reusable UI components
-│   │   │   ├── 📁 common/
-│   │   │   ├── 📁 auth/
-│   │   │   ├── 📁 test/
-│   │   │   └── 📁 results/
-│   │   │
-│   │   ├── 📁 pages/            # Route components
-│   │   │   ├── Home/
-│   │   │   ├── Login/
-│   │   │   ├── Dashboard/
-│   │   │   ├── Test/
-│   │   │   └── Results/
-│   │   │
-│   │   ├── 📁 context/          # React context providers
-│   │   │   └── AuthContext.jsx
-│   │   │
-│   │   ├── 📁 services/         # API service calls
-│   │   │   └── api.js
-│   │   │
-│   │   ├── 📁 utils/            # Frontend utilities
-│   │   │
-│   │   ├── 📁 assets/           # Static assets (images, icons)
-│   │   │
-│   │   └── 📁 styles/           # Global styles
-│   │
-│   └── 📁 public/               # Static files (favicon, index.html)
-│
-├── 📁 Json-Animation/           # Lottie animation JSON files
-│   ├── AdminAuth.json
-│   ├── Login.json
-│   ├── SightUp.json
-│   ├── success.json
-│   └── Dashboard_screen.json
-│
-└── 📄 README.md                 # Project documentation
+.
+|-- README.md
+|-- aspirelens-backend
+|   |-- package-lock.json
+|   |-- package.json
+|   `-- src
+|       |-- config
+|       |   |-- db.js
+|       |   `-- passport.js
+|       |-- controllers
+|       |   |-- adminAuthController.js
+|       |   |-- adminController.js
+|       |   |-- authController.js
+|       |   |-- testController.js
+|       |   |-- tests
+|       |   `-- userController.js
+|       |-- middleware
+|       |   |-- adminAuth.js
+|       |   |-- adminMiddleware.js
+|       |   |-- authMiddleware.js
+|       |   `-- profileMiddleware.js
+|       |-- migration.js
+|       |-- models
+|       |   |-- Career.js
+|       |   |-- Question.js
+|       |   |-- TestResults.js
+|       |   |-- TestSessions.js
+|       |   |-- User.js
+|       |   |-- UserActivity.js
+|       |   |-- UserAnswer.js
+|       |   `-- index.js
+|       |-- routes
+|       |   |-- adminAuthRoutes.js
+|       |   |-- adminRoutes.js
+|       |   |-- aiRoutes.js
+|       |   |-- authRoutes.js
+|       |   |-- counsellingRoutes.js
+|       |   |-- dashboard.js
+|       |   |-- testRoutes.js
+|       |   `-- userRoutes.js
+|       |-- server.js
+|       |-- services
+|       |   |-- openaiService.js
+|       |   `-- questionService.js
+|       `-- utils
+|           |-- levelCalculator.js
+|           |-- sendEmail.js
+|           `-- updateActivity.js
+|-- aspirelens-frontend
+|   |-- README.md
+|   |-- eslint.config.js
+|   |-- index.html
+|   |-- package-lock.json
+|   |-- package.json
+|   |-- public
+|   |   |-- aspirelens-logo.png
+|   |   `-- aspirelens-logo2.png
+|   |-- src
+|   |   |-- App.jsx
+|   |   |-- Json-Animation
+|   |   |   |-- AdminAuth.json
+|   |   |   |-- Dashboard_screen.json
+|   |   |   |-- Login.json
+|   |   |   |-- SighUp.json
+|   |   |   `-- success.json
+|   |   |-- assets
+|   |   |   |-- aspirelens-logo.png
+|   |   |   `-- aspirelens-logo2.png
+|   |   |-- components
+|   |   |   |-- AdminAuthGuard.jsx
+|   |   |   |-- Navbar.jsx
+|   |   |   |-- ProtectedRoute.jsx
+|   |   |   `-- admin
+|   |   |-- context
+|   |   |   |-- AuthContext.jsx
+|   |   |   |-- AuthProvider.jsx
+|   |   |   `-- ThemeContext.jsx
+|   |   |-- layouts
+|   |   |   `-- AdminLayout.jsx
+|   |   |-- main.jsx
+|   |   `-- pages
+|   |       |-- AboutUs.jsx
+|   |       |-- AdminDashboard.jsx
+|   |       |-- AdminLogin.jsx
+|   |       |-- CareerCounselling.jsx
+|   |       |-- Dashboard.jsx
+|   |       |-- HeroHome.jsx
+|   |       |-- HeroSection.jsx
+|   |       |-- Login.jsx
+|   |       |-- MyProfile.jsx
+|   |       |-- SignUp.jsx
+|   |       |-- StartTest.jsx
+|   |       |-- TestResult.jsx
+|   |       |-- TestRunner.jsx
+|   |       |-- TestSubmitted.jsx
+|   |       |-- VerifyEmail.jsx
+|   |       |-- Welcome.jsx
+|   |       |-- email-verified.jsx
+|   |       `-- verify-email-info.jsx
+|   `-- vite.config.js
+`-- structure.txt
+
+20 directories, 80 files
+
 
 ---
 
