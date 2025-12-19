@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../api/api";
 import { useState, useEffect } from 'react';
 import { Shield, Lock, Key, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
@@ -50,8 +50,8 @@ export default function AdminLogin() {
     }
 
     try {
-      await axios.post(
-        "http://localhost:5000/api/admin/auth/login-password",
+      await api.post(
+        "/api/admin/auth/login-password",
         {
           email: formData.adminId,
           password: formData.password,
@@ -76,8 +76,8 @@ export default function AdminLogin() {
     }
   
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/admin/auth/verify-otp",
+      const res = await api.post(
+        "/api/admin/auth/verify-otp",
         {
           email: formData.adminId,
           otp: formData.twoFactorCode,

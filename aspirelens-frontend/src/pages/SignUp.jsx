@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { User, Mail, Lock, Eye, EyeOff, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from "../api/api";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -48,7 +48,7 @@ export default function SignUp() {
   }
 
   try {
-    const res = await axios.post("http://localhost:5000/api/auth/register", {
+    const res = await api.post("/api/auth/register", {
       firstName: formData.firstName,
       lastName: formData.lastName,
       email: formData.email,

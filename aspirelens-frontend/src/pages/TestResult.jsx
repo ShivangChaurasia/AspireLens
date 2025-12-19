@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Save, AlertTriangle, Home as HomeIcon } from 'lucide-react';
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api/api";
 import {
   Award,
   BarChart,
@@ -60,8 +60,8 @@ export default function TestResult() {
           return;
         }
 
-        const response = await axios.get(
-          `http://localhost:5000/api/test/result/${testSessionId}`,
+        const response = await api.get(
+          `/api/test/result/${testSessionId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -109,8 +109,8 @@ export default function TestResult() {
       const token = getToken();
       if (!token) return;
 
-      const response = await axios.get(
-        `http://localhost:5000/api/test/result/${testSessionId}/pdf`,
+      const response = await api.get(
+        `/api/test/result/${testSessionId}/pdf`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

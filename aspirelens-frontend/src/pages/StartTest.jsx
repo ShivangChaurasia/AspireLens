@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api/api";
 import { Loader2, AlertCircle, Rocket, Clock, BookOpen, TrendingUp, Save, Lock, CheckCircle, X } from "lucide-react";
 
 export default function StartTest() {
@@ -23,8 +23,8 @@ export default function StartTest() {
         return;
       }
   
-      const response = await axios.post(
-        "http://localhost:5000/api/test/start",
+      const response = await api.post(
+        "/api/test/start",
         {},
         {
           headers: {

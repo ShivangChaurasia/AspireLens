@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api/api";
 import AuthContext from "../context/AuthContext";
 import { Link } from "react-router-dom";
 
@@ -38,8 +38,8 @@ export default function Dashboard() {
       const token = localStorage.getItem("token");
 
       // Fetch fresh user data from backend
-      const res = await axios.get(
-        "http://localhost:5000/api/user/me",
+      const res = await api.get(
+        "/api/user/me",
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -56,8 +56,8 @@ export default function Dashboard() {
 
       // Update activity in background
       try {
-        await axios.post(
-          "http://localhost:5000/api/user/update-activity",
+        await api.post(
+          "/api/user/update-activity",
           {},
           { headers: { Authorization: `Bearer ${token}` } }
         );

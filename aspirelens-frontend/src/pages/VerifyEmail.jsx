@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api/api";
 import { useSearchParams } from "react-router-dom";
 
 export default function VerifyEmail() {
@@ -11,8 +11,8 @@ export default function VerifyEmail() {
   useEffect(() => {
     async function verify() {
       try {
-        await axios.get(
-          `http://localhost:5000/api/auth/verify-email?token=${token}`,
+        await api.get(
+          `/api/auth/verify-email?token=${token}`,
           { withCredentials: false }
         );
 

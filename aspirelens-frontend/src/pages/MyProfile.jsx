@@ -20,7 +20,7 @@ import {
   AlertCircle,
   LogIn
 } from "lucide-react";
-import axios from "axios";
+import api from "../api/api";
 
 export default function MyProfile() {
   const {logout } = useContext(AuthContext);
@@ -117,7 +117,7 @@ export default function MyProfile() {
         return;
       }
 
-      const res = await axios.get("http://localhost:5000/api/user/me", {
+      const res = await api.get("/api/user/me", {
         headers: { 
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -217,7 +217,7 @@ export default function MyProfile() {
         }
       };
 
-      const res = await axios.post("http://localhost:5000/api/user/update-profile", updateData, {
+      const res = await api.post("/api/user/update-profile", updateData, {
         headers: { 
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -300,8 +300,8 @@ export default function MyProfile() {
         return;
       }
 
-      const res = await axios.post(
-        "http://localhost:5000/api/user/change-password",
+      const res = await api.post(
+        "/api/user/change-password",
         { oldPassword, newPassword },
         {
           headers: {

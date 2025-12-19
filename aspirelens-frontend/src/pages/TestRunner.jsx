@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api/api";
 import {
   Clock,
   CheckCircle,
@@ -112,8 +112,8 @@ export default function TestRunner() {
         return;
       }
 
-      const response = await axios.post(
-        `http://localhost:5000/api/test/submit/${testSessionId}`,
+      const response = await api.post(
+        `/api/test/submit/${testSessionId}`,
         { reason },
         {
           headers: {
@@ -206,8 +206,8 @@ export default function TestRunner() {
         return;
       }
 
-      const response = await axios.get(
-        `http://localhost:5000/api/test/session/${testSessionId}`,
+      const response = await api.get(
+        `/api/test/session/${testSessionId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -455,8 +455,8 @@ export default function TestRunner() {
       const token = getToken();
       if (!token) return;
 
-      const response = await axios.post(
-        "http://localhost:5000/api/test/answer",
+      const response = await api.post(
+        "/api/test/answer",
         {
           testSessionId,
           questionId,
@@ -605,8 +605,8 @@ export default function TestRunner() {
         violationTimerRef.current = null;
       }
 
-      const response = await axios.post(
-        `http://localhost:5000/api/test/submit/${testSessionId}`,
+      const response = await api.post(
+        `/api/test/submit/${testSessionId}`,
         {},
         {
           headers: {

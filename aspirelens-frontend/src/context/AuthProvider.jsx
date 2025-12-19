@@ -1,6 +1,6 @@
 // src/context/AuthProvider.jsx
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api/api";
 import AuthContext from "./AuthContext"; // ✅ Import named export
 
 export default function AuthProvider({ children }) {
@@ -27,7 +27,7 @@ export default function AuthProvider({ children }) {
           return;
         }
 
-        const res = await axios.get("http://localhost:5000/api/auth/me", {
+        const res = await api.get("/api/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
 

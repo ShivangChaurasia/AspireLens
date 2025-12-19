@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Save, AlertTriangle } from 'lucide-react';
-import axios from 'axios';
+import api from "../api/api";
 import { 
   AlertCircle, 
   Loader2, 
@@ -55,8 +55,8 @@ const CareerCounselling = () => {
       }
 
       // Use the GET endpoint
-      const response = await axios.get(
-        `http://localhost:5000/api/counselling/data/${testSessionId}`,
+      const response = await api.get(
+        `/api/counselling/data/${testSessionId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -102,8 +102,8 @@ const CareerCounselling = () => {
       setError("");
       
       const token = localStorage.getItem("token");
-      const response = await axios.post(
-        `http://localhost:5000/api/counselling/generate/${testSessionId}`,
+      const response = await api.post(
+        `/api/counselling/generate/${testSessionId}`,
         {},
         {
           headers: {

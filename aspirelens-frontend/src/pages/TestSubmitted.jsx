@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
+import api from "../api/api";
 import {
   CheckCircle,
   AlertCircle,
@@ -41,8 +41,8 @@ export default function TestSubmitted() {
         }
 
         // Use your existing endpoint
-        const response = await axios.get(
-          `http://localhost:5000/api/test/submitted/${testSessionId}`,
+        const response = await api.get(
+          `/api/test/submitted/${testSessionId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
