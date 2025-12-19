@@ -6,7 +6,7 @@ import Login from "./pages/Login.jsx";
 import SignUp from "./pages/SignUp.jsx";
 import VerifyEmailInfo from './pages/verify-email-info.jsx';
 import EmailVerified from './pages/VerifyEmail.jsx';
-import VerifyEmail from './pages/email-verified.jsx';
+// import VerifyEmail from './pages/email-verified.jsx';
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import Dashboard from './pages/Dashboard.jsx';
 import HeroHome from './pages/HeroHome.jsx';
@@ -55,7 +55,7 @@ export default function App() {
                         <Route path="/signup" element={<SignUp />} />
                         <Route path="/verify-email-info" element={<VerifyEmailInfo />} />
                         <Route path="/email-verified" element={<EmailVerified />} />
-                        <Route path="/verify-email" element={<VerifyEmail />} />
+                        {/* <Route path="/verify-email" element={<VerifyEmail />} /> */}
 
                         {/* Protected Routes */}
                         <Route path="/dashboard" element={

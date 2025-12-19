@@ -9,13 +9,14 @@ export default function SignUp() {
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    firstname: '',
-    lastname: '',
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
     confirmPassword: '',
     agreeToTerms: false
   });
+
 
   const [passwordStrength, setPasswordStrength] = useState(0);
 
@@ -34,18 +35,21 @@ export default function SignUp() {
     checkPasswordStrength(newPassword);
   };
 
-  const handleSubmit = async (e) => {
+ const handleSubmit = async (e) => {
   e.preventDefault();
-    if (loading) return;
-  // Check password match
+
+  if (loading) return;
+  setLoading(true);
+
   if (formData.password !== formData.confirmPassword) {
     alert("Passwords don't match!");
+    setLoading(false);
     return;
   }
 
-  // Check if terms accepted
   if (!formData.agreeToTerms) {
     alert("You must agree to the Terms & Privacy Policy.");
+    setLoading(false);
     return;
   }
 
@@ -58,17 +62,16 @@ export default function SignUp() {
     });
 
     console.log("Signup success:", res.data);
-
-    // Redirect user to email verification instructions page
     navigate("/email-verified");
 
-    } catch (error) {
-      console.error("Signup Error:", error.response?.data || error);
-      alert(error.response?.data?.message || "Signup failed");
-  }finally{
+  } catch (error) {
+    console.error("Signup Error:", error.response?.data || error);
+    alert(error.response?.data?.message || "Signup failed");
+  } finally {
     setLoading(false);
   }
-  };
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50 flex items-center justify-center p-4">
