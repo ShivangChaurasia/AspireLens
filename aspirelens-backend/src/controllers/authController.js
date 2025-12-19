@@ -11,6 +11,7 @@ import { updateUserActivity } from "../utils/updateActivity.js";
 export const register = async (req, res) => {
   try {
 
+    console.log("➡️ Signup started for:", email);
     
     const { firstName, lastName, email, password } = req.body;
     
@@ -37,33 +38,24 @@ export const register = async (req, res) => {
       passwordHash,
       role: "student",
     });
-    
-      console.log("➡️ Signup started for:", email);
 
+    console.log("✅ Verification email sent");
+    // Generate Email Verification Token
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+      const verificationExpiry = Date.now() + 1000 * 60 * 60; // 1 hour
+
+      newUser.emailVerificationToken = verificationToken;
+      newUser.emailVerificationExpires = verificationExpiry;
+
+      // Save user
       await newUser.save();
       console.log("✅ User saved");
 
+      const verifyUrl = `https://aspirelens-backend.onrender.com/api/auth/verify-email?token=${verificationToken}`;
+
+
+
       console.log("📨 Sending verification email...");
-      await sendEmail(
-        email,
-        "Verify your AspireLens email",
-        `Verify link: ${verifyUrl}`
-      );
-      console.log("✅ Verification email sent");
-    // Generate Email Verification Token
-    const verificationToken = crypto.randomBytes(32).toString("hex");
-    const verificationExpiry = Date.now() + 1000 * 60 * 60; // 1 hour
-
-    newUser.emailVerificationToken = verificationToken;
-    newUser.emailVerificationExpires = verificationExpiry;
-
-    // Save user
-    await newUser.save();
-
-    const verifyUrl = `https://aspirelens-backend.onrender.com/api/auth/verify-email?token=${verificationToken}`;
-
-
-
     // Send verification email
     await sendEmail(
       email,
