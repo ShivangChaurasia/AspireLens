@@ -19,12 +19,30 @@ dotenv.config();
 const app = express();
 
 // Middleware
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://careerwithaspirelens.vercel.app",
+];
+
 app.use(
   cors({
-    origin: "http://localhost:5173", // Vite frontend
+    origin: function (origin, callback) {
+      // Allow server-to-server, Postman, etc.
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
+
+// Handle preflight requests
+app.options("*", cors());
+
 app.use(express.json());
 
 // Routes
