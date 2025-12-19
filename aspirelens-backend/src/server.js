@@ -20,6 +20,21 @@ const app = express();
 
 // Middleware
 
+import { sendEmail } from "./utils/sendEmail.js";
+
+app.get("/api/test-email", async (req, res) => {
+  try {
+    await sendEmail(
+      "your_email@gmail.com",
+      "AspireLens – Resend Test",
+      "✅ Resend is working on Render!"
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+});
+
 app.use(
   cors({
     origin: function (origin, callback) {
