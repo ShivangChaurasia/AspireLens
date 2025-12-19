@@ -46,9 +46,8 @@ export const register = async (req, res) => {
     // Save user
     await newUser.save();
 
-    // Build verification URL
-    // const verifyUrl = `http://localhost:5173/verify-email?token=${verificationToken}`;
-    const verifyUrl = `http://localhost:5000/api/auth/verify-email?token=${verificationToken}`;
+    const verifyUrl = `https://aspirelens-backend.onrender.com/api/auth/verify-email?token=${verificationToken}`;
+
 
     // Send verification email
     await sendEmail(
@@ -117,7 +116,7 @@ export const verifyEmail = async (req, res) => {
       AspireLens Team`
     );
 
-    return res.redirect("http://localhost:5173/verify-email");
+    return res.redirect("https://careerwithaspirelens.vercel.app/verify-email");
 
   } catch (error) {
     console.error("Verify Email Error:", error.message);
