@@ -1,9 +1,7 @@
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
-import nodemailer from "nodemailer";
 import jwt from "jsonwebtoken";
-
-
+import { sendEmail } from "../utils/sendEmail.js";
 
 export const adminLoginPassword = async (req, res) => {
   try {
@@ -29,27 +27,26 @@ export const adminLoginPassword = async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const otpExpiresAt = Date.now() + 5 * 60 * 1000;
 
-    // ✅ IMPORTANT FIX — no `.save()`
+    // 4️⃣ Save OTP (NO .save())
     await User.updateOne(
       { _id: admin._id },
       { otp, otpExpiresAt }
     );
 
-    // 4️⃣ Send OTP email
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.SMTP_EMAIL,
-        pass: process.env.SMTP_PASSWORD,
-      },
-    });
+    // 5️⃣ Send OTP email (NON-BLOCKING)
+    try {
+      await sendEmail(
+        admin.email,
+        "AspireLens Admin Login OTP",
+        `Your AspireLens admin login OTP is: ${otp}
 
-    await transporter.sendMail({
-      from: process.env.SMTP_EMAIL,
-      to: admin.email,
-      subject: "AspireLens Admin Login OTP",
-      text: `Your OTP is ${otp}. It expires in 5 minutes.`,
-    });
+This OTP expires in 5 minutes.
+
+If you did not attempt to log in, please ignore this email.`
+      );
+    } catch (err) {
+      console.error("Admin OTP email failed:", err.message);
+    }
 
     return res.json({
       success: true,
@@ -61,6 +58,7 @@ export const adminLoginPassword = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+
 
 
 export const verifyAdminOTP = async (req, res) => {

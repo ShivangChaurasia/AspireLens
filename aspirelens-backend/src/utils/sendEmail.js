@@ -1,6 +1,6 @@
 export const sendEmail = async (to, subject, text) => {
   try {
-    const res = await fetch("https://api.resend.com/emails", {
+    const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -14,12 +14,12 @@ export const sendEmail = async (to, subject, text) => {
       }),
     });
 
-    if (!res.ok) {
-      const error = await res.text();
-      console.error("Resend email failed:", error);
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Resend email failed:", errorText);
     }
 
-  } catch (err) {
-    console.error("Resend email error:", err.message);
+  } catch (error) {
+    console.error("Resend email error:", error.message);
   }
 };
