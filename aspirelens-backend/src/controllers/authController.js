@@ -11,25 +11,25 @@ import { updateUserActivity } from "../utils/updateActivity.js";
 export const register = async (req, res) => {
   try {
 
-    console.log("➡️ Signup started for:", email);
-    
     const { firstName, lastName, email, password } = req.body;
-    
+
+    console.log("➡️ Signup started for:", email);
+
     // Validate
     if (!firstName || !lastName || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
-    
+
     // Check if email already exists
     const exists = await User.findOne({ email });
     if (exists) {
       return res.status(400).json({ message: "Email already exists" });
     }
-    
+
     // Hash password
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
-    
+
     // Create new user
     const newUser = new User({
       firstName,
@@ -39,40 +39,36 @@ export const register = async (req, res) => {
       role: "student",
     });
 
-    console.log("✅ Verification email sent");
     // Generate Email Verification Token
     const verificationToken = crypto.randomBytes(32).toString("hex");
-      const verificationExpiry = Date.now() + 1000 * 60 * 60; // 1 hour
+    const verificationExpiry = Date.now() + 1000 * 60 * 60;
 
-      newUser.emailVerificationToken = verificationToken;
-      newUser.emailVerificationExpires = verificationExpiry;
+    newUser.emailVerificationToken = verificationToken;
+    newUser.emailVerificationExpires = verificationExpiry;
 
-      // Save user
-      await newUser.save();
-      console.log("✅ User saved");
+    await newUser.save();
+    console.log("✅ User saved");
 
-      const verifyUrl = `https://aspirelens-backend.onrender.com/api/auth/verify-email?token=${verificationToken}`;
+    const verifyUrl = `https://aspirelens-backend.onrender.com/api/auth/verify-email?token=${verificationToken}`;
 
-
-
-      console.log("📨 Sending verification email...");
-    // Send verification email
+    console.log("📨 Sending verification email...");
     await sendEmail(
       email,
       "Verify your AspireLens email",
       `Hi ${firstName},
 
-      Please verify your email by clicking the link below:
-      ${verifyUrl}
+Please verify your email by clicking the link below:
+${verifyUrl}
 
-      This link expires in 1 hour.
+This link expires in 1 hour.
 
-      Best Regards,
-      AspireLens Team`
+Best Regards,
+AspireLens Team`
     );
 
-    // Response
-    res.status(201).json({
+    console.log("✅ Verification email sent");
+
+    return res.status(201).json({
       message: "Signup successful — please verify your email.",
       user: {
         id: newUser._id,
@@ -84,13 +80,14 @@ export const register = async (req, res) => {
     });
 
   } catch (error) {
-  console.error("REGISTER FULL ERROR OBJECT:", error);
-  res.status(500).json({
-    message: error.message,
-    errorName: error.name,
-  });
-}
+    console.error("REGISTER FULL ERROR OBJECT:", error);
+    return res.status(500).json({
+      message: error.message,
+      errorName: error.name,
+    });
+  }
 };
+
 
 //
 // ======================= VERIFY EMAIL =======================
