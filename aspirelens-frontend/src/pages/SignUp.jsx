@@ -6,6 +6,8 @@ import api from "../api/api";
 export default function SignUp() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     firstname: '',
     lastname: '',
@@ -34,7 +36,7 @@ export default function SignUp() {
 
   const handleSubmit = async (e) => {
   e.preventDefault();
-
+    if (loading) return;
   // Check password match
   if (formData.password !== formData.confirmPassword) {
     alert("Passwords don't match!");
@@ -63,6 +65,8 @@ export default function SignUp() {
     } catch (error) {
       console.error("Signup Error:", error.response?.data || error);
       alert(error.response?.data?.message || "Signup failed");
+  }finally{
+    setLoading(false);
   }
   };
 
@@ -245,23 +249,30 @@ export default function SignUp() {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 text-white py-3.5 rounded-xl font-semibold text-lg hover:from-cyan-600 hover:to-blue-600 transform hover:-translate-y-0.5 transition-all duration-300 shadow-lg hover:shadow-xl"
+              disabled={loading}
+              className={`w-full py-3.5 rounded-xl font-semibold text-lg transition-all duration-300 shadow-lg
+                ${
+                  loading
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 transform hover:-translate-y-0.5 hover:shadow-xl"
+                }
+              `}
             >
-              Create Account
+              {loading ? "Creating Account..." : "Create Account"}
             </button>
 
             {/* Divider */}
-            <div className="relative my-8">
+            {/* <div className="relative my-8">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300"></div>
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="px-4 bg-white text-gray-500">Or sign up with</span>
               </div>
-            </div>
+            </div> */}
 
             {/* Social Signup */}
-            <div className="flex flex-col sm:flex-row gap-4">
+            {/* <div className="flex flex-col sm:flex-row gap-4">
               <button
                 type="button"
                 className="flex-1 flex items-center justify-center px-4 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
@@ -283,7 +294,7 @@ export default function SignUp() {
                 </svg>
                 GitHub
               </button>
-            </div>
+            </div> */}
 
             {/* Login Link */}
             <div className="text-center pt-6">

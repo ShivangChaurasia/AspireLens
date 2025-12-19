@@ -12,6 +12,6 @@ export const sendEmail = async (to, subject, text) => {
     });
   } catch (error) {
     console.error("Resend Email Error:", error);
-    throw error; // IMPORTANT: bubble up error
+    throw error;
   }
 };

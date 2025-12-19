@@ -10,23 +10,25 @@ import { updateUserActivity } from "../utils/updateActivity.js";
 //
 export const register = async (req, res) => {
   try {
-    const { firstName, lastName, email, password } = req.body;
 
+    
+    const { firstName, lastName, email, password } = req.body;
+    
     // Validate
     if (!firstName || !lastName || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
-
+    
     // Check if email already exists
     const exists = await User.findOne({ email });
     if (exists) {
       return res.status(400).json({ message: "Email already exists" });
     }
-
+    
     // Hash password
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
-
+    
     // Create new user
     const newUser = new User({
       firstName,
@@ -35,7 +37,19 @@ export const register = async (req, res) => {
       passwordHash,
       role: "student",
     });
+    
+      console.log("➡️ Signup started for:", email);
 
+      await newUser.save();
+      console.log("✅ User saved");
+
+      console.log("📨 Sending verification email...");
+      await sendEmail(
+        email,
+        "Verify your AspireLens email",
+        `Verify link: ${verifyUrl}`
+      );
+      console.log("✅ Verification email sent");
     // Generate Email Verification Token
     const verificationToken = crypto.randomBytes(32).toString("hex");
     const verificationExpiry = Date.now() + 1000 * 60 * 60; // 1 hour
@@ -46,8 +60,7 @@ export const register = async (req, res) => {
     // Save user
     await newUser.save();
 
-  const verifyUrl =
-    `https://aspirelens-backend.onrender.com/api/auth/verify-email?token=${verificationToken}`;
+    const verifyUrl = `https://aspirelens-backend.onrender.com/api/auth/verify-email?token=${verificationToken}`;
 
 
 
@@ -121,7 +134,7 @@ export const verifyEmail = async (req, res) => {
       AspireLens Team`
     );
 
-    return res.redirect("https://careerwithaspirelens.vercel.app/verify-email");
+    res.redirect("https://careerwithaspirelens.vercel.app/verify-email");
 
   } catch (error) {
     console.error("Verify Email Error:", error.message);
