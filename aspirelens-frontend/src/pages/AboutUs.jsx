@@ -1,6 +1,6 @@
 // src/pages/AboutUs.jsx
 import React, { useContext } from 'react';
-import AuthContext from '../context/AuthContext';
+import AuthContext from '../context/authContext';
 import { 
   Target, 
   Eye, 
