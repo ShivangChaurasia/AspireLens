@@ -52,19 +52,25 @@ export const register = async (req, res) => {
     const verifyUrl = `https://aspirelens-backend.onrender.com/api/auth/verify-email?token=${verificationToken}`;
 
     console.log("📨 Sending verification email...");
-    await sendEmail(
-      email,
-      "Verify your AspireLens email",
-      `Hi ${firstName},
+//     await sendEmail(
+//       email,
+//       "Verify your AspireLens email",
+//       `Hi ${firstName},
 
-Please verify your email by clicking the link below:
-${verifyUrl}
+// Please verify your email by clicking the link below:
+// ${verifyUrl}
 
-This link expires in 1 hour.
+// This link expires in 1 hour.
 
-Best Regards,
-AspireLens Team`
-    );
+// Best Regards,
+// AspireLens Team`
+//     );
+await sendEmail(
+  "careerwith.aspirelens@gmail.com", // YOUR RESEND ACCOUNT EMAIL
+  "AspireLens Verification Test",
+  "If you receive this, Resend is working."
+);
+
 
     console.log("✅ Verification email sent");
 
