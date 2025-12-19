@@ -19,29 +19,27 @@ dotenv.config();
 const app = express();
 
 // Middleware
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://careerwithaspirelens.vercel.app",
-];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow server-to-server, Postman, etc.
       if (!origin) return callback(null, true);
 
+      const allowedOrigins = [
+        "http://localhost:5173",
+        "https://careerwithaspirelens.vercel.app",
+      ];
+
       if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
+        callback(null, true);
       } else {
-        return callback(new Error("Not allowed by CORS"));
+        callback(new Error("Not allowed by CORS"));
       }
     },
     credentials: true,
   })
 );
 
-// Handle preflight requests
-app.options("*", cors());
 
 app.use(express.json());
 
