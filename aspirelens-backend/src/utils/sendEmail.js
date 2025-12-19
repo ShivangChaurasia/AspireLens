@@ -1,23 +1,25 @@
-import nodemailer from "nodemailer";
-
 export const sendEmail = async (to, subject, text) => {
   try {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.SMTP_EMAIL,
-        pass: process.env.SMTP_PASSWORD,
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
       },
+      body: JSON.stringify({
+        from: "AspireLens <onboarding@resend.dev>",
+        to,
+        subject,
+        text,
+      }),
     });
 
-    await transporter.sendMail({
-      from: `"AspireLens" <${process.env.SMTP_EMAIL}>`,
-      to,
-      subject,
-      text,
-    });
- 
-  } catch (error) {
-    console.error("Email error:", error);
+    if (!res.ok) {
+      const error = await res.text();
+      console.error("Resend email failed:", error);
+    }
+
+  } catch (err) {
+    console.error("Resend email error:", err.message);
   }
 };

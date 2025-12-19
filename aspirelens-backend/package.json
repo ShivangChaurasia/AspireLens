@@ -20,7 +20,6 @@
     "groq-sdk": "^0.37.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.0.1",
-    "nodemailer": "^7.0.11",
     "pdfkit": "^0.17.2"
   },
   "devDependencies": {

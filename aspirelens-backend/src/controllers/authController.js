@@ -46,7 +46,9 @@ export const register = async (req, res) => {
     // Save user
     await newUser.save();
 
-    const verifyUrl = `https://aspirelens-backend.onrender.com/api/auth/verify-email?token=${verificationToken}`;
+  const verifyUrl =
+    `https://aspirelens-backend.onrender.com/api/auth/verify-email?token=${verificationToken}`;
+
 
 
     // Send verification email
