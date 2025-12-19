@@ -1,7 +1,7 @@
 // src/context/AuthProvider.jsx
 import { useEffect, useState } from "react";
 import api from "../api/api";
-import AuthContext from "./AuthContext"; // ✅ Import named export
+import AuthContext from "./authContext"; // ✅ Import named export
 
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState(null);

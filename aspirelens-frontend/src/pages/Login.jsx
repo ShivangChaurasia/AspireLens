@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from 'react'; // ✅ Added useEffect
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
 import api from "../api/api";
 import { useNavigate } from "react-router-dom";
-import AuthContext from '../context/AuthContext';
+import AuthContext from '../context/authContext';
 
 export default function Login() {
   const navigate = useNavigate();
