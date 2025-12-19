@@ -39,8 +39,9 @@ const userSchema = new mongoose.Schema(
       educationLevel: {
         type: String,
         enum: ["School", "Undergraduate", "Postgraduate", "Professional"],
-        required: true,
+        default: null,
       },
+
 
       // CONDITIONAL STAGE
       // School → 11,12
@@ -77,6 +78,9 @@ const userSchema = new mongoose.Schema(
 userSchema.pre("save", function () {
   if (!this.profile) this.profile = {};
 
+  // ⛔ Skip validation until profile is complete
+  if (!this.profile.educationLevel) return;
+
   const level = this.profile.educationLevel;
   const stage = this.profile.educationStage;
 
@@ -97,5 +101,6 @@ userSchema.pre("save", function () {
 
   this.profile.lastActive = new Date();
 });
+
 
 export default mongoose.model("User", userSchema);
