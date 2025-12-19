@@ -77,9 +77,12 @@ export const register = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Register Error:", error.message);
-    res.status(500).json({ message: "Server error" });
-  }
+  console.error("REGISTER FULL ERROR OBJECT:", error);
+  res.status(500).json({
+    message: error.message,
+    errorName: error.name,
+  });
+}
 };
 
 //
