@@ -65,7 +65,7 @@ const userSchema = new mongoose.Schema(
 
     isProfileComplete: { type: Boolean, default: false },
 
-    isEmailVerified: { type: Boolean, default: false },
+    isEmailVerified: { type: Boolean, default: true },
     emailVerificationToken: String,
     emailVerificationExpires: Date,
   },

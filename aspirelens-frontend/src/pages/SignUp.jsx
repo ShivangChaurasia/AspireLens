@@ -60,7 +60,7 @@ export default function SignUp() {
     console.log("Signup success:", res.data);
 
     // Redirect user to email verification instructions page
-    navigate("/verify-email-info");
+    navigate("/email-verified");
 
     } catch (error) {
       console.error("Signup Error:", error.response?.data || error);

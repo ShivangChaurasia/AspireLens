@@ -1,16 +1,21 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
-import { sendEmail } from "../utils/sendEmail.js";
-import crypto from "crypto";
 import { updateUserActivity } from "../utils/updateActivity.js";
+
+/**
+ * ============================================================
+ * ⚠️ EMAIL VERIFICATION TEMPORARILY DISABLED
+ * Users are auto-verified to ensure accessibility.
+ * Email verification can be re-enabled later.
+ * ============================================================
+ */
 
 //
 // ======================= REGISTER =======================
 //
 export const register = async (req, res) => {
   try {
-
     const { firstName, lastName, email, password } = req.body;
 
     console.log("➡️ Signup started for:", email);
@@ -30,52 +35,23 @@ export const register = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
 
-    // Create new user
+    // Create new user (AUTO VERIFIED)
     const newUser = new User({
       firstName,
       lastName,
       email,
       passwordHash,
       role: "student",
+      isEmailVerified: true, // ✅ AUTO VERIFY
+      emailVerificationToken: null,
+      emailVerificationExpires: null,
     });
 
-    // Generate Email Verification Token
-    const verificationToken = crypto.randomBytes(32).toString("hex");
-    const verificationExpiry = Date.now() + 1000 * 60 * 60;
-
-    newUser.emailVerificationToken = verificationToken;
-    newUser.emailVerificationExpires = verificationExpiry;
-
     await newUser.save();
-    console.log("✅ User saved");
-
-    const verifyUrl = `https://aspirelens-backend.onrender.com/api/auth/verify-email?token=${verificationToken}`;
-
-    console.log("📨 Sending verification email...");
-//     await sendEmail(
-//       email,
-//       "Verify your AspireLens email",
-//       `Hi ${firstName},
-
-// Please verify your email by clicking the link below:
-// ${verifyUrl}
-
-// This link expires in 1 hour.
-
-// Best Regards,
-// AspireLens Team`
-//     );
-await sendEmail(
-  "careerwith.aspirelens@gmail.com", // YOUR RESEND ACCOUNT EMAIL
-  "AspireLens Verification Test",
-  "If you receive this, Resend is working."
-);
-
-
-    console.log("✅ Verification email sent");
+    console.log("✅ User saved & auto-verified");
 
     return res.status(201).json({
-      message: "Signup successful — please verify your email.",
+      message: "Signup successful",
       user: {
         id: newUser._id,
         firstName,
@@ -86,56 +62,13 @@ await sendEmail(
     });
 
   } catch (error) {
-    console.error("REGISTER FULL ERROR OBJECT:", error);
+    console.error("Register Error:", error);
     return res.status(500).json({
-      message: error.message,
-      errorName: error.name,
+      message: error.message || "Server error",
     });
   }
 };
 
-
-//
-// ============================================================= VERIFY EMAIL =================================================================
-//
-export const verifyEmail = async (req, res) => {
-  try {
-    const { token } = req.query;
-
-    const user = await User.findOne({
-      emailVerificationToken: token,
-      emailVerificationExpires: { $gt: Date.now() }
-    });
-
-    if (!user) {
-      return res.status(400).json({ message: "Invalid or expired token" });
-    }
-
-    user.isEmailVerified = true;
-    user.emailVerificationToken = null;
-    user.emailVerificationExpires = null;
-
-    await user.save();
-
-    // OPTIONAL: Send welcome email after verification
-
-    await sendEmail(
-      user.email,
-      "Welcome to AspireLens!",
-      `Hi ${user.firstName},
-      Thank you for verifying your email!
-      You can now log in and continue your journey.
-      Best Regards,
-      AspireLens Team`
-    );
-
-    res.redirect("https://careerwithaspirelens.vercel.app/verify-email");
-
-  } catch (error) {
-    console.error("Verify Email Error:", error.message);
-    res.status(500).json({ message: "Server error" });
-  }
-};
 
 //
 // ======================= LOGIN =======================
@@ -151,16 +84,16 @@ export const login = async (req, res) => {
 
     // Find user
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    // Block login if email not verified
-    if (!user.isEmailVerified) {
-      return res.status(403).json({
-        message: "Please verify your email before logging in."
-      });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
 
-
+    // Email verification check (will always pass for new users)
+    if (!user.isEmailVerified) {
+      return res.status(403).json({
+        message: "Please verify your email before logging in.",
+      });
+    }
 
     // Check password
     const match = await bcrypt.compare(password, user.passwordHash);
@@ -169,6 +102,7 @@ export const login = async (req, res) => {
     }
 
     await updateUserActivity(user._id);
+
     // Create token
     const token = jwt.sign(
       { id: user._id, role: user.role },
@@ -176,7 +110,7 @@ export const login = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    res.json({
+    return res.json({
       message: "Login successful",
       token,
       user: {
@@ -190,15 +124,18 @@ export const login = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Login Error:", error.message);
-    res.status(500).json({ message: "Server error" });
+    console.error("Login Error:", error);
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
+
+//
 // ======================= GET CURRENT USER =======================
+//
 export const getCurrentUser = (req, res) => {
   return res.status(200).json({
     success: true,
-    user: req.user,  // This works because middleware attaches user object
+    user: req.user,
   });
 };
