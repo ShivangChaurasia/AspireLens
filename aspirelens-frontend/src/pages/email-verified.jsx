@@ -33,7 +33,7 @@ export default function EmailVerified() {
     // Auto redirect (IMPORTANT: replace to avoid loop)
     const redirectTimer = setTimeout(() => {
       navigate("/login", { replace: true });
-    }, 4000);
+    }, 9000);
 
     return () => {
       clearTimeout(redirectTimer);
