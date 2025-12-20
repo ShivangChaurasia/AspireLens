@@ -478,9 +478,182 @@ return (
           </div>
         </section> */}
 
+          {/* Development Team Section */}
+<section className="mb-16">
+  <div className="text-center mb-12">
+    <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+      Meet Our <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Development Team</span>
+    </h2>
+    <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+      The passionate developers behind AspireLens, building the future of career guidance.
+    </p>
+  </div>
 
+  <div className="grid md:grid-cols-3 gap-8">
+    {/* Developer 1: Shivang */}
+    <div className="group transform transition-all duration-500 hover:-translate-y-2">
+      <div className="bg-gradient-to-br from-white to-blue-50 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-blue-100/50 relative overflow-hidden h-full">
+        {/* Animated corner accent */}
+        <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-400 to-cyan-400 opacity-5 group-hover:opacity-10 transition-opacity duration-500 rounded-bl-3xl"></div>
+        
+        {/* Developer Avatar */}
+        <div className="flex justify-center mb-6">
+          <div className="relative group/avatar">
+            <div className="absolute -inset-3 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full blur-lg opacity-0 group-hover/avatar:opacity-30 transition-opacity duration-500"></div>
+            <div className="relative w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg">
+              <span className="text-3xl font-bold text-white">SC</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Developer Info */}
+        <div className="text-center">
+          <h3 className="text-2xl font-bold text-gray-900 mb-3">
+            Shivang <span className="text-blue-600">Chaurasia</span>
+          </h3>
+          
+          {/* Email */}
+          <div className="mb-6">
+            <a
+              href="mailto:shiva17ng@gmail.com"
+              className="inline-flex items-center justify-center px-4 py-2.5 bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-700 rounded-xl font-medium hover:from-blue-100 hover:to-cyan-100 transition-all duration-300 border border-blue-200/50 group/email w-full"
+            >
+              <svg className="w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+              <span className="text-sm truncate">shiva17ng@gmail.com</span>
+              <svg className="w-4 h-4 ml-2 text-blue-400 opacity-0 group-hover/email:opacity-100 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+            </a>
+          </div>
+
+          {/* Role Badge */}
+          <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 text-blue-700 rounded-full text-sm font-medium border border-blue-200">
+            <div className="w-2 h-2 bg-blue-500 rounded-full mr-2 animate-pulse"></div>
+            Lead Developer
+          </div>
+        </div>
+
+        {/* Hover indicator line */}
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-cyan-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left"></div>
+      </div>
+    </div>
+
+    {/* Developer 2: Riya */}
+    <div className="group transform transition-all duration-500 hover:-translate-y-2">
+      <div className="bg-gradient-to-br from-white to-purple-50 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-purple-100/50 relative overflow-hidden h-full">
+        {/* Animated corner accent */}
+        <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-purple-400 to-pink-400 opacity-5 group-hover:opacity-10 transition-opacity duration-500 rounded-bl-3xl"></div>
+        
+        {/* Developer Avatar */}
+        <div className="flex justify-center mb-6">
+          <div className="relative group/avatar">
+            <div className="absolute -inset-3 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-lg opacity-0 group-hover/avatar:opacity-30 transition-opacity duration-500"></div>
+            <div className="relative w-24 h-24 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
+              <span className="text-3xl font-bold text-white">R</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Developer Info */}
+        <div className="text-center">
+          <h3 className="text-2xl font-bold text-gray-900 mb-3">
+            <span className="text-purple-600">Riya</span>
+          </h3>
+          
+          {/* Email */}
+          <div className="mb-6">
+            <a
+              href="mailto:briya1597@gmail.com"
+              className="inline-flex items-center justify-center px-4 py-2.5 bg-gradient-to-r from-purple-50 to-pink-50 text-purple-700 rounded-xl font-medium hover:from-purple-100 hover:to-pink-100 transition-all duration-300 border border-purple-200/50 group/email w-full"
+            >
+              <svg className="w-4 h-4 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+              <span className="text-sm truncate">briya1597@gmail.com</span>
+              <svg className="w-4 h-4 ml-2 text-purple-400 opacity-0 group-hover/email:opacity-100 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+            </a>
+          </div>
+
+          {/* Role Badge */}
+          <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-500/10 to-pink-500/10 text-purple-700 rounded-full text-sm font-medium border border-purple-200">
+            <div className="w-2 h-2 bg-purple-500 rounded-full mr-2 animate-pulse"></div>
+            Frontend Developer
+          </div>
+        </div>
+
+        {/* Hover indicator line */}
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-purple-400 to-pink-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left"></div>
+      </div>
+    </div>
+
+    {/* Developer 3: Aditya */}
+    <div className="group transform transition-all duration-500 hover:-translate-y-2">
+      <div className="bg-gradient-to-br from-white to-green-50 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-green-100/50 relative overflow-hidden h-full">
+        {/* Animated corner accent */}
+        <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-400 opacity-5 group-hover:opacity-10 transition-opacity duration-500 rounded-bl-3xl"></div>
+        
+        {/* Developer Avatar */}
+        <div className="flex justify-center mb-6">
+          <div className="relative group/avatar">
+            <div className="absolute -inset-3 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full blur-lg opacity-0 group-hover/avatar:opacity-30 transition-opacity duration-500"></div>
+            <div className="relative w-24 h-24 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center shadow-lg">
+              <span className="text-3xl font-bold text-white">AG</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Developer Info */}
+        <div className="text-center">
+          <h3 className="text-2xl font-bold text-gray-900 mb-3">
+            Aditya <span className="text-green-600">Gupta</span>
+          </h3>
+          
+          {/* Email */}
+          <div className="mb-6">
+            <a
+              href="mailto:adityagupta@gmail.com"
+              className="inline-flex items-center justify-center px-4 py-2.5 bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 rounded-xl font-medium hover:from-green-100 hover:to-emerald-100 transition-all duration-300 border border-green-200/50 group/email w-full"
+            >
+              <svg className="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+              <span className="text-sm truncate">adityagupta@gmail.com</span>
+              <svg className="w-4 h-4 ml-2 text-green-400 opacity-0 group-hover/email:opacity-100 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+            </a>
+          </div>
+
+          {/* Role Badge */}
+          <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-500/10 to-emerald-500/10 text-green-700 rounded-full text-sm font-medium border border-green-200">
+            <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+            Backend Developer
+          </div>
+        </div>
+
+        {/* Hover indicator line */}
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 to-emerald-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left"></div>
+      </div>
+    </div>
+  </div>
+
+  {/* Team Description */}
+  <div className="mt-12 text-center">
+    <div className="inline-block p-6 bg-gradient-to-r from-blue-50 via-purple-50 to-green-50 rounded-2xl border border-gray-200/50 max-w-2xl mx-auto">
+      <p className="text-gray-700 text-lg">
+        Our team combines expertise in modern web technologies to deliver a seamless, 
+        secure, and scalable career guidance platform. We're committed to building 
+        tools that empower your professional journey.
+      </p>
+    </div>
+  </div>
+</section>
         {/* Footer Note */}
-        {/* <div className="text-center pt-12 border-t border-gray-200/50">
+        <div className="text-center pt-12 border-t border-gray-200/50">
           <p className="text-gray-500 text-lg font-medium">
             AspireLens — <span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent font-bold">Illuminating paths, empowering careers.</span>
           </p>
@@ -489,7 +662,8 @@ return (
             <div className="w-20 h-1 bg-gradient-to-r from-transparent via-purple-400 to-transparent rounded-full"></div>
             <div className="w-20 h-1 bg-gradient-to-r from-transparent to-blue-400 rounded-full"></div>
           </div>
-        </div>*/}
+        </div>
+        
       </div>
       {/* Add these animations to your global CSS or Tailwind config */}
       <style jsx>{`
