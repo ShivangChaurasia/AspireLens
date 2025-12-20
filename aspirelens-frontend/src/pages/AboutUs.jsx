@@ -327,7 +327,7 @@ return (
           </div>
         </section>
 
-        // Add this section in your AboutUs.jsx, before the footer section
+
 
 {/* Developer Card Section */}
 <section className="mb-16">
