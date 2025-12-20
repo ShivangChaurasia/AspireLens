@@ -330,13 +330,13 @@ return (
 
 
 {/* Developer Card Section */}
-<section className="mb-16">
-  <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-8 md:p-12 shadow-2xl border border-gray-700/50 relative overflow-hidden group">
+{/* <section className="mb-16">
+  <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-8 md:p-12 shadow-2xl border border-gray-700/50 relative overflow-hidden group"> */}
     {/* Animated background pattern */}
-    <div className="absolute inset-0 opacity-10">
+    {/* <div className="absolute inset-0 opacity-10">
       <div className="absolute top-10 right-10 w-40 h-40 border-2 border-blue-500 rounded-full animate-spin-slow"></div>
       <div className="absolute bottom-10 left-10 w-32 h-32 border-2 border-purple-500 rounded-full animate-spin-slow reverse"></div>
-    </div>
+    </div> */}
     
     {/* Binary code background effect */}
     {/* <div className="absolute inset-0 opacity-5 text-xs font-mono text-green-400 overflow-hidden">
@@ -356,34 +356,34 @@ return (
       ))}
     </div> */}
 
-    <div className="relative z-10">
-      <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8">
+    {/* <div className="relative z-10">
+      <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8"> */}
         {/* Developer Avatar */}
-        <div className="relative group/avatar">
+        {/* <div className="relative group/avatar">
           <div className="absolute -inset-4 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-3xl blur-xl opacity-30 group-hover/avatar:opacity-50 transition-opacity duration-500"></div>
-          <div className="relative w-32 h-32 rounded-2xl overflow-hidden border-4 border-gray-700 shadow-2xl transform group-hover/avatar:scale-105 transition-transform duration-500">
+          <div className="relative w-32 h-32 rounded-2xl overflow-hidden border-4 border-gray-700 shadow-2xl transform group-hover/avatar:scale-105 transition-transform duration-500"> */}
             {/* Placeholder for developer photo - you can replace this with an actual image */}
-            <div className="w-full h-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
+            {/* <div className="w-full h-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
               <span className="text-4xl font-bold text-white">SC</span>
-            </div>
+            </div> */}
             
             {/* Online status indicator */}
-            <div className="absolute top-3 right-3 w-4 h-4 bg-green-500 rounded-full border-2 border-gray-900 animate-pulse">
+            {/* <div className="absolute top-3 right-3 w-4 h-4 bg-green-500 rounded-full border-2 border-gray-900 animate-pulse">
               <div className="absolute inset-0 bg-green-400 rounded-full animate-ping opacity-75"></div>
             </div>
-          </div>
+          </div> */}
           
           {/* Tech stack badges floating around avatar */}
-          <div className="absolute -top-2 -left-2 bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg transform rotate-12 group-hover/avatar:-translate-y-1 transition-transform duration-300">
+          {/* <div className="absolute -top-2 -left-2 bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg transform rotate-12 group-hover/avatar:-translate-y-1 transition-transform duration-300">
             React
           </div>
           <div className="absolute -bottom-2 -right-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg transform -rotate-12 group-hover/avatar:translate-y-1 transition-transform duration-300">
             Node.js
           </div>
-        </div>
+        </div> */}
 
                 {/* Developer Info */}
-                <div className="flex-1 text-center lg:text-left">
+                {/* <div className="flex-1 text-center lg:text-left">
                   <div className="mb-6">
                     <span className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-300 rounded-full text-sm font-semibold border border-blue-500/30 mb-4">
                       <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
@@ -401,10 +401,10 @@ return (
                       I believe in writing clean, efficient code and building scalable applications 
                       that make a difference.
                     </p>
-                  </div>
+                  </div> */}
 
                   {/* Contact & Links */}
-                  <div className="flex flex-wrap gap-4 mb-6">
+                  {/* <div className="flex flex-wrap gap-4 mb-6">
                     <a
                       href="mailto:shiva17ng@gmail.com"
                       className="inline-flex items-center px-5 py-3 bg-gradient-to-r from-blue-600/20 to-blue-800/20 text-blue-300 rounded-xl font-medium hover:from-blue-600/30 hover:to-blue-800/30 transition-all duration-300 border border-blue-500/30 group/email"
@@ -441,10 +441,10 @@ return (
                       </svg>
                       LinkedIn
                     </a>
-                  </div>
+                  </div> */}
 
                   {/* Tech Stack */}
-                  <div>
+                  {/* <div>
                     <h4 className="text-lg font-semibold text-gray-300 mb-4">Tech Stack</h4>
                     <div className="flex flex-wrap gap-3">
                       {['React', 'Node.js', 'MongoDB', 'Express', 'Tailwind CSS', 'JavaScript', 'AWS'].map((tech, index) => (
@@ -459,9 +459,9 @@ return (
                   </div>
                 </div>
               </div>
-                    
+                     */}
               {/* Developer Quote */}
-              <div className="mt-10 pt-8 border-t border-gray-700/50">
+              {/* <div className="mt-10 pt-8 border-t border-gray-700/50">
                 <div className="flex items-start">
                   <svg className="w-8 h-8 text-blue-400/50 mr-4 mt-1" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
@@ -476,11 +476,11 @@ return (
               </div>
             </div>
           </div>
-        </section>
+        </section> */}
 
 
         {/* Footer Note */}
-        <div className="text-center pt-12 border-t border-gray-200/50">
+        {/* <div className="text-center pt-12 border-t border-gray-200/50">
           <p className="text-gray-500 text-lg font-medium">
             AspireLens — <span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent font-bold">Illuminating paths, empowering careers.</span>
           </p>
@@ -489,9 +489,8 @@ return (
             <div className="w-20 h-1 bg-gradient-to-r from-transparent via-purple-400 to-transparent rounded-full"></div>
             <div className="w-20 h-1 bg-gradient-to-r from-transparent to-blue-400 rounded-full"></div>
           </div>
-        </div>
+        </div>*/}
       </div>
-      
       {/* Add these animations to your global CSS or Tailwind config */}
       <style jsx>{`
             @keyframes spin-slow {
