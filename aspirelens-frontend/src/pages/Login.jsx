@@ -1,8 +1,8 @@
-import { useState, useEffect, useContext } from 'react'; // ✅ Added useEffect
+import { useState, useEffect, useContext } from 'react';
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
-import api from "../api/api";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import AuthContext from '../context/authContext';
+import AuthContext from '../context/AuthContext';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -15,6 +15,20 @@ export default function Login() {
   const { setUser } = useContext(AuthContext);
   const [LottieComponent, setLottieComponent] = useState(null);
   const [animationData, setAnimationData] = useState(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  // Track mouse movement for parallax
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePosition({
+        x: (e.clientX / window.innerWidth - 0.5) * 20,
+        y: (e.clientY / window.innerHeight - 0.5) * 20
+      });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   useEffect(() => {
     // Load Lottie component
@@ -27,7 +41,7 @@ export default function Login() {
       });
 
     // Load animation data
-    import('../Json-Animation/Login.json') // Changed to Login.json for login page
+    import('../Json-Animation/Login.json')
       .then(module => {
         setAnimationData(module.default);
       })
@@ -39,13 +53,13 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.post("/api/auth/login", {
+      const res = await axios.post("http://localhost:5000/api/auth/login", {
         email: formData.email,
         password: formData.password
       });
 
       localStorage.setItem("token", res.data.token);
-      setUser(res.data.user); // update context immediately
+      setUser(res.data.user);
       navigate("/home-hero");
 
       console.log("Login Successful:", res.data);
@@ -57,8 +71,142 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-white flex items-center justify-center p-4">
-      <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-white flex items-center justify-center p-4 relative overflow-hidden">
+      
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        
+        {/* Floating gradient orbs */}
+        <div 
+          className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-blue-200/20 to-cyan-200/20 rounded-full blur-3xl"
+          style={{
+            transform: `translate(${mousePosition.x * 0.3}px, ${mousePosition.y * 0.3}px)`,
+            animation: 'float 20s ease-in-out infinite'
+          }}
+        />
+        
+        <div 
+          className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-cyan-200/15 to-blue-200/15 rounded-full blur-3xl"
+          style={{
+            transform: `translate(${-mousePosition.x * 0.2}px, ${-mousePosition.y * 0.2}px)`,
+            animation: 'float 15s ease-in-out infinite reverse'
+          }}
+        />
+        
+        <div 
+          className="absolute top-1/2 right-1/3 w-64 h-64 bg-gradient-to-r from-blue-300/10 to-cyan-300/10 rounded-full blur-3xl"
+          style={{
+            transform: `translate(${mousePosition.x * 0.4}px, ${-mousePosition.y * 0.4}px)`,
+            animation: 'float 25s ease-in-out infinite'
+          }}
+        />
+        
+        <div 
+          className="absolute bottom-1/3 left-1/4 w-72 h-72 bg-gradient-to-r from-cyan-300/10 to-blue-300/10 rounded-full blur-3xl"
+          style={{
+            transform: `translate(${-mousePosition.x * 0.5}px, ${mousePosition.y * 0.5}px)`,
+            animation: 'float 18s ease-in-out infinite reverse'
+          }}
+        />
+
+        {/* Animated grid lines */}
+        <div 
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: `linear-gradient(90deg, transparent 95%, rgba(59, 130, 246, 0.3) 100%),
+                              linear-gradient(0deg, transparent 95%, rgba(6, 182, 212, 0.3) 100%)`,
+            backgroundSize: '50px 50px',
+            animation: 'gridMove 20s linear infinite',
+          }}
+        />
+        
+        <div 
+          className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage: `linear-gradient(45deg, transparent 90%, rgba(59, 130, 246, 0.2) 100%),
+                              linear-gradient(-45deg, transparent 90%, rgba(6, 182, 212, 0.2) 100%)`,
+            backgroundSize: '100px 100px',
+            animation: 'gridMove 30s linear infinite reverse',
+          }}
+        />
+
+        {/* Floating particles */}
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-2 h-2 rounded-full bg-gradient-to-r from-blue-400/30 to-cyan-400/30"
+            style={{
+              left: `${(i * 5) % 100}%`,
+              top: `${(i * 7) % 100}%`,
+              animation: `particleFloat ${10 + i * 2}s ease-in-out infinite`,
+              animationDelay: `${i * 0.3}s`,
+              transform: `translate(${mousePosition.x * 0.1}px, ${mousePosition.y * 0.1}px)`,
+            }}
+          />
+        ))}
+
+        {/* Wave lines */}
+        <div 
+          className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-blue-400/5 to-transparent"
+          style={{
+            maskImage: 'url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1200 120%22%3E%3Cpath d=%22M0 0v46.29c47.79 22.2 103.59 32.17 158 28 70.36-5.37 136.33-33.31 206.8-37.5 73.84-4.36 147.54 16.88 218.2 35.26 69.27 18 138.3 24.88 209.4 13.08 36.15-6 69.85-17.84 104.45-29.34C989.49 25 1113-14.29 1200 52.47V0z%22/%3E%3Cpath d=%22M0 0v15.81c13 21.11 27.64 41.05 47.69 56.24C99.41 111.27 165 111 224.58 91.58c31.15-10.15 60.09-26.07 89.67-39.8 40.92-19 84.73-46 130.83-49.67 36.26-2.85 70.9 9.42 98.6 31.56 31.77 25.39 62.32 62 103.63 73 40.44 10.79 81.35 6.36 117.1-6.53 35.75-12.89 74.22-28.1 109.63-44.16 35.44-16.07 74.47-33.26 108.46-50 33.99-16.74 71.18-36.82 99.58-56.5 28.4-19.68 50.4-41.05 72.19-63.96 21.79-22.92 43.6-47.3 64.49-72.72 20.89-25.42 41.78-51.87 63.19-78.24 21.41-26.37 43.3-53.68 65.2-81.29V0z%22/%3E%3C/svg%3E")',
+            animation: 'waveMove 15s ease-in-out infinite',
+          }}
+        />
+        
+        <div 
+          className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-cyan-400/5 to-transparent"
+          style={{
+            maskImage: 'url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1200 120%22%3E%3Cpath d=%22M0 0v46.29c47.79 22.2 103.59 32.17 158 28 70.36-5.37 136.33-33.31 206.8-37.5 73.84-4.36 147.54 16.88 218.2 35.26 69.27 18 138.3 24.88 209.4 13.08 36.15-6 69.85-17.84 104.45-29.34C989.49 25 1113-14.29 1200 52.47V0z%22/%3E%3Cpath d=%22M0 0v15.81c13 21.11 27.64 41.05 47.69 56.24C99.41 111.27 165 111 224.58 91.58c31.15-10.15 60.09-26.07 89.67-39.8 40.92-19 84.73-46 130.83-49.67 36.26-2.85 70.9 9.42 98.6 31.56 31.77 25.39 62.32 62 103.63 73 40.44 10.79 81.35 6.36 117.1-6.53 35.75-12.89 74.22-28.1 109.63-44.16 35.44-16.07 74.47-33.26 108.46-50 33.99-16.74 71.18-36.82 99.58-56.5 28.4-19.68 50.4-41.05 72.19-63.96 21.79-22.92 43.6-47.3 64.49-72.72 20.89-25.42 41.78-51.87 63.19-78.24 21.41-26.37 43.3-53.68 65.2-81.29V0z%22/%3E%3C/svg%3E")',
+            animation: 'waveMove 20s ease-in-out infinite reverse',
+            animationDelay: '2s',
+          }}
+        />
+
+        {/* Animated light streaks */}
+        <div 
+          className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-400/20 to-transparent"
+          style={{
+            animation: 'lightStreak 8s ease-in-out infinite',
+          }}
+        />
+        
+        <div 
+          className="absolute top-20 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-400/15 to-transparent"
+          style={{
+            animation: 'lightStreak 12s ease-in-out infinite',
+            animationDelay: '1s',
+          }}
+        />
+        
+        <div 
+          className="absolute bottom-20 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-400/10 to-transparent"
+          style={{
+            animation: 'lightStreak 15s ease-in-out infinite',
+            animationDelay: '3s',
+          }}
+        />
+
+        {/* Pulsing circles */}
+        <div 
+          className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 border border-blue-300/20 rounded-full"
+          style={{
+            animation: 'pulseRing 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          }}
+        />
+        
+        <div 
+          className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 border border-cyan-300/15 rounded-full"
+          style={{
+            animation: 'pulseRing 6s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            animationDelay: '1s',
+          }}
+        />
+
+      </div>
+
+      {/* Main Content */}
+      <div className="relative z-10 max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
 
         {/* Left Side - Brand/Info with Animation */}
         <div className="hidden lg:block">
@@ -81,72 +229,37 @@ export default function Login() {
               Access personalized insights, smart analytics, and tools that help you navigate your educational journey with precision.
             </p>
 
-            {/* Animation Container */}
-            {/* <div className="mb-10 bg-gradient-to-br from-cyan-50 to-blue-50 rounded-3xl p-6 border border-cyan-100 shadow-lg">
-              <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">
-                Welcome Experience
-              </h3> */}
-              <div className=" mr-">
-                {LottieComponent && animationData ? (
-                  <LottieComponent
-                    animationData={animationData}
-                    loop={true}
-                    autoplay={true}
-                    style={{ width: '100%', maxWidth: 700, height: 550 }}
-                    rendererSettings={{
-                      preserveAspectRatio: 'xMidYMid meet'
-                    }}
-                  />
-                ) : (
-                  <div className="text-center py-8">
-                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-cyan-500/20 to-blue-500/20 mb-4">
-                      <span className="text-4xl">🔭</span>
-                    </div>
-                    <h4 className="text-lg font-bold text-gray-800 mb-2">Loading Interactive Experience</h4>
-                    <p className="text-gray-600 text-sm max-w-md">
-                      Preparing your personalized login experience...
-                    </p>
-                    <div className="flex justify-center space-x-2 mt-4">
-                      <div className="h-2 w-2 bg-cyan-500 rounded-full animate-pulse"></div>
-                      <div className="h-2 w-2 bg-blue-500 rounded-full animate-pulse delay-75"></div>
-                      <div className="h-2 w-2 bg-purple-500 rounded-full animate-pulse delay-150"></div>
-                    </div>
+            <div className="mr-">
+              {LottieComponent && animationData ? (
+                <LottieComponent
+                  animationData={animationData}
+                  loop={true}
+                  autoplay={true}
+                  style={{ width: '100%', maxWidth: 700, height: 550 }}
+                  rendererSettings={{
+                    preserveAspectRatio: 'xMidYMid meet'
+                  }}
+                />
+              ) : (
+                <div className="text-center py-8">
+                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-cyan-500/20 to-blue-500/20 mb-4">
+                    <span className="text-4xl">🔭</span>
                   </div>
-                )}
-              </div>
-            {/* </div> */}
+                  <h4 className="text-lg font-bold text-gray-800 mb-2">Loading Interactive Experience</h4>
+                  <p className="text-gray-600 text-sm max-w-md">
+                    Preparing your personalized login experience...
+                  </p>
+                  <div className="flex justify-center space-x-2 mt-4">
+                    <div className="h-2 w-2 bg-cyan-500 rounded-full animate-pulse"></div>
+                    <div className="h-2 w-2 bg-blue-500 rounded-full animate-pulse delay-75"></div>
+                    <div className="h-2 w-2 bg-purple-500 rounded-full animate-pulse delay-150"></div>
+                  </div>
+                </div>
+              )}
+            </div>
 
-            {/* Features */}
             <div className="space-y-6">
-              {/* <div className="flex items-center">
-                <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-4">
-                  <span className="text-blue-600">🎯</span>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-gray-900">Personalized Dashboard</h4>
-                  <p className="text-gray-500 text-sm">Your goals, your data, your way</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center">
-                <div className="h-10 w-10 rounded-full bg-cyan-100 flex items-center justify-center mr-4">
-                  <span className="text-cyan-600">📊</span>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-gray-900">Smart Analytics</h4>
-                  <p className="text-gray-500 text-sm">AI-powered insights at your fingertips</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center">
-                <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center mr-4">
-                  <span className="text-purple-600">🔒</span>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-gray-900">Secure & Private</h4>
-                  <p className="text-gray-500 text-sm">Your data is always protected</p>
-                </div>
-              </div> */}
+              {/* Empty space for features if needed later */}
             </div>
           </div>
         </div>
@@ -235,41 +348,6 @@ export default function Login() {
               <ArrowRight className="ml-2 h-5 w-5" />
             </button>
 
-            {/* Divider */}
-            {/* <div className="relative my-8">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-gray-500">Or continue with</span>
-              </div>
-            </div> */}
-
-            {/* Social Login */}
-            {/* <div className="grid grid-cols-2 gap-4">
-              <button
-                type="button"
-                className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
-              >
-                <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                </svg>
-                Google
-              </button>
-              <button
-                type="button"
-                className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
-              >
-                <svg className="w-5 h-5 mr-2 text-gray-800" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                </svg>
-                GitHub
-              </button>
-            </div> */}
-
             {/* Sign Up Link */}
             <div className="text-center pt-6">
               <p className="text-gray-600">
@@ -282,6 +360,81 @@ export default function Login() {
           </form>
         </div>
       </div>
+
+      {/* Custom Animations */}
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% {
+            transform: translate(0, 0);
+          }
+          33% {
+            transform: translate(30px, -50px);
+          }
+          66% {
+            transform: translate(-20px, 40px);
+          }
+        }
+        
+        @keyframes particleFloat {
+          0%, 100% {
+            transform: translate(0, 0) scale(1);
+            opacity: 0.3;
+          }
+          50% {
+            transform: translate(20px, -30px) scale(1.2);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes gridMove {
+          0% {
+            background-position: 0 0;
+          }
+          100% {
+            background-position: 100px 100px;
+          }
+        }
+        
+        @keyframes waveMove {
+          0% {
+            transform: translateX(0);
+          }
+          50% {
+            transform: translateX(-30px);
+          }
+          100% {
+            transform: translateX(0);
+          }
+        }
+        
+        @keyframes lightStreak {
+          0% {
+            transform: translateX(-100%);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          90% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+        }
+        
+        @keyframes pulseRing {
+          0% {
+            transform: translate(-50%, -50%) scale(0.8);
+            opacity: 0.5;
+          }
+          80%, 100% {
+            transform: translate(-50%, -50%) scale(1.5);
+            opacity: 0;
+          }
+        }
+      `}</style>
     </div>
   );
 }
