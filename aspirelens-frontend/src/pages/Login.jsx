@@ -324,7 +324,7 @@ export default function Login() {
             </div>
 
             {/* Remember & Forgot */}
-            <div className="flex items-center justify-between space-x-4">
+            <div className="flex items-center justify-between space-x-6">
               <label className="flex items-center">
                 <input
                   type="checkbox"
