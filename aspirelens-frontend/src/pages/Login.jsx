@@ -324,7 +324,7 @@ export default function Login() {
             </div>
 
             {/* Remember & Forgot */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between space-x-4">
               <label className="flex items-center">
                 <input
                   type="checkbox"
@@ -335,7 +335,7 @@ export default function Login() {
                 <span className="ml-2 text-sm text-gray-700">Remember me</span>
               </label>
               <a href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-800 font-medium">
-                Forgot password? Mail To: careerwith.aspirelens@gmail.com
+                Forgot password? careerwith.aspirelens@gmail.com
               </a>
             </div>
 
