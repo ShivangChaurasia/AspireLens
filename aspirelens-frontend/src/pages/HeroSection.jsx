@@ -1,18 +1,22 @@
 import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
-import { useInView } from "react-intersection-observer";
 
 export default function HeroSection() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const containerRef = useRef(null);
+  const [isBadgeVisible, setIsBadgeVisible] = useState(false);
+  const [isTitleVisible, setIsTitleVisible] = useState(false);
+  const [isSubtitleVisible, setIsSubtitleVisible] = useState(false);
+  const [isButtonVisible, setIsButtonVisible] = useState(false);
+  const [isFeaturesVisible, setIsFeaturesVisible] = useState(false);
+  const [isTrustedVisible, setIsTrustedVisible] = useState(false);
   
-  const [badgeRef, badgeInView] = useInView({ triggerOnce: true, threshold: 0.5 });
-  const [titleRef, titleInView] = useInView({ triggerOnce: true, threshold: 0.3 });
-  const [subtitleRef, subtitleInView] = useInView({ triggerOnce: true, threshold: 0.3 });
-  const [buttonRef, buttonInView] = useInView({ triggerOnce: true, threshold: 0.5 });
-  const [featuresRef, featuresInView] = useInView({ triggerOnce: true, threshold: 0.2 });
-  const [trustedRef, trustedInView] = useInView({ triggerOnce: true, threshold: 0.2 });
+  const containerRef = useRef(null);
+  const badgeRef = useRef(null);
+  const titleRef = useRef(null);
+  const subtitleRef = useRef(null);
+  const buttonRef = useRef(null);
+  const featuresRef = useRef(null);
+  const trustedRef = useRef(null);
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -24,33 +28,41 @@ export default function HeroSection() {
       }
     };
 
+    // Intersection Observer for scroll animations
+    const createObserver = (ref, setVisible) => {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setVisible(true);
+            observer.unobserve(entry.target);
+          }
+        },
+        { threshold: 0.2 }
+      );
+      
+      if (ref.current) {
+        observer.observe(ref.current);
+      }
+      
+      return observer;
+    };
+
+    const observers = [
+      createObserver(badgeRef, setIsBadgeVisible),
+      createObserver(titleRef, setIsTitleVisible),
+      createObserver(subtitleRef, setIsSubtitleVisible),
+      createObserver(buttonRef, setIsButtonVisible),
+      createObserver(featuresRef, setIsFeaturesVisible),
+      createObserver(trustedRef, setIsTrustedVisible),
+    ];
+
     window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      observers.forEach(observer => observer.disconnect());
+    };
   }, []);
-
-  const floatAnimation = {
-    animate: {
-      y: [0, -10, 0],
-      transition: {
-        duration: 3,
-        repeat: Infinity,
-        ease: "easeInOut"
-      }
-    }
-  };
-
-  const featureVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: (i) => ({
-      opacity: 1,
-      y: 0,
-      transition: {
-        delay: i * 0.1,
-        duration: 0.6,
-        ease: "easeOut"
-      }
-    })
-  };
 
   const features = [
     { icon: "🧭", title: "Smart Navigation", desc: "Intuitive mapping with AI-powered insights", color: "blue" },
@@ -66,200 +78,218 @@ export default function HeroSection() {
       className="relative min-h-screen flex flex-col items-center justify-center px-6 md:px-20 py-20 bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 overflow-hidden"
     >
       {/* Animated background elements */}
-      <motion.div 
-        className="absolute top-1/4 left-1/4 w-64 h-64 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 rounded-full blur-3xl"
-        animate={{
-          x: mousePosition.x * 0.5,
-          y: mousePosition.y * 0.5,
+      <div 
+        className="absolute top-1/4 left-1/4 w-64 h-64 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 rounded-full blur-3xl transition-transform duration-300"
+        style={{
+          transform: `translate(${mousePosition.x * 0.5}px, ${mousePosition.y * 0.5}px)`
         }}
-        transition={{ type: "spring", stiffness: 50, damping: 20 }}
       />
-      <motion.div 
-        className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-amber-400/10 to-orange-400/10 rounded-full blur-3xl"
-        animate={{
-          x: -mousePosition.x * 0.3,
-          y: -mousePosition.y * 0.3,
+      <div 
+        className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-amber-400/10 to-orange-400/10 rounded-full blur-3xl transition-transform duration-500"
+        style={{
+          transform: `translate(${-mousePosition.x * 0.3}px, ${-mousePosition.y * 0.3}px)`
         }}
-        transition={{ type: "spring", stiffness: 30, damping: 20 }}
       />
       
       {/* Floating particles */}
       {[...Array(5)].map((_, i) => (
-        <motion.div
+        <div
           key={i}
-          className="absolute w-2 h-2 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full"
+          className="absolute w-2 h-2 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full animate-float"
           style={{
             left: `${20 + i * 15}%`,
             top: `${30 + i * 10}%`,
-          }}
-          animate={{
-            y: [0, -40, 0],
-            x: [0, Math.sin(i) * 20, 0],
-            opacity: [0.5, 1, 0.5],
-          }}
-          transition={{
-            duration: 3 + i,
-            repeat: Infinity,
-            delay: i * 0.5,
+            animationDelay: `${i * 0.5}s`,
+            animationDuration: `${3 + i}s`
           }}
         />
       ))}
 
       <div className="max-w-6xl mx-auto text-center relative z-10">
         {/* Eyebrow/badge */}
-        <motion.div 
+        <div 
           ref={badgeRef}
-          initial={{ opacity: 0, y: -20, scale: 0.8 }}
-          animate={badgeInView ? { opacity: 1, y: 0, scale: 1 } : {}}
-          transition={{ duration: 0.5, type: "spring" }}
-          className="inline-block mb-6"
+          className={`inline-block mb-6 transition-all duration-700 ${isBadgeVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 -translate-y-5 scale-95'}`}
         >
-          <motion.span 
-            whileHover={{ scale: 1.05, rotate: [-1, 1, -1, 1, 0] }}
-            className="px-4 py-2 bg-gradient-to-r from-amber-400 to-orange-400 text-white font-semibold rounded-full text-sm md:text-base shadow-lg backdrop-blur-sm"
+          <span 
+            className="px-4 py-2 bg-gradient-to-r from-amber-400 to-orange-400 text-white font-semibold rounded-full text-sm md:text-base shadow-lg backdrop-blur-sm hover:scale-105 hover:rotate-1 transition-transform duration-300 inline-block"
           >
             🚀 Intelligent Exploration
-          </motion.span>
-        </motion.div>
+          </span>
+        </div>
 
         {/* Main heading */}
         <div ref={titleRef}>
-          <motion.h1 
-            initial={{ opacity: 0, y: 30 }}
-            animate={titleInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6 }}
-            className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight"
+          <h1 
+            className={`text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight transition-all duration-700 ${isTitleVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
           >
             <span className="block text-gray-900">See the World Through</span>
-            <motion.span 
-              initial={{ backgroundPosition: "0% 50%" }}
-              animate={{ backgroundPosition: "100% 50%" }}
-              transition={{ duration: 3, repeat: Infinity, repeatType: "reverse" }}
+            <span 
+              className="block bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-clip-text text-transparent mt-2 animate-gradient"
               style={{ backgroundSize: "200% 200%" }}
-              className="block bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-clip-text text-transparent mt-2"
             >
               a Smarter Lens
-            </motion.span>
-          </motion.h1>
+            </span>
+          </h1>
         </div>
 
         {/* Subheading */}
-        <motion.div 
+        <div 
           ref={subtitleRef}
-          initial={{ opacity: 0 }}
-          animate={subtitleInView ? { opacity: 1 } : {}}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          className={`transition-all duration-700 ${isSubtitleVisible ? 'opacity-100' : 'opacity-0'}`}
         >
           <p className="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto mb-10 leading-relaxed">
             <span className="font-semibold text-gray-900">AspireLens</span> helps you explore, map, and understand your surroundings with clarity and purpose.
             <br />
-            <motion.span 
-              variants={floatAnimation}
-              animate="animate"
-              className="text-lg md:text-xl text-gray-600 italic mt-2 block"
+            <span 
+              className="text-lg md:text-xl text-gray-600 italic mt-2 block animate-float-slow"
             >
               Discover smarter. Act faster. Live better.
-            </motion.span>
+            </span>
           </p>
-        </motion.div>
+        </div>
 
         {/* Button */}
-        <motion.div 
+        <div 
           ref={buttonRef}
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={buttonInView ? { opacity: 1, scale: 1 } : {}}
-          transition={{ duration: 0.5 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16"
+          className={`flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 transition-all duration-700 ${isButtonVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}
         >
           <Link to="/login">
-            <motion.button 
-              whileHover={{ scale: 1.05, y: -5 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold text-lg rounded-xl overflow-hidden group w-full sm:w-auto"
+            <button 
+              className="relative px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold text-lg rounded-xl overflow-hidden group w-full sm:w-auto hover:scale-105 hover:-translate-y-1 active:scale-95 transition-all duration-300"
             >
               {/* Button shine effect */}
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                initial={{ x: "-100%" }}
-                whileHover={{ x: "100%" }}
-                transition={{ duration: 0.6 }}
-              />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-600" />
               <span className="relative z-10">Evaluate Your Career</span>
-            </motion.button>
+            </button>
           </Link>
-        </motion.div>
+        </div>
 
         {/* Stats/Features */}
         <div ref={featuresRef} className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
           {features.map((feature, index) => (
-            <motion.div
+            <div
               key={feature.title}
-              custom={index}
-              initial="hidden"
-              animate={featuresInView ? "visible" : "hidden"}
-              variants={featureVariants}
-              whileHover={{ y: -10, scale: 1.02 }}
-              className={`bg-white p-6 rounded-2xl shadow-lg border border-${feature.color}-100 backdrop-blur-sm relative overflow-hidden group`}
+              className={`bg-white p-6 rounded-2xl shadow-lg border border-${feature.color}-100 backdrop-blur-sm relative overflow-hidden group transition-all duration-500 hover:-translate-y-2 hover:scale-102 ${isFeaturesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+              style={{ transitionDelay: `${index * 100}ms` }}
             >
               {/* Hover effect background */}
               <div className={`absolute inset-0 bg-gradient-to-br from-${feature.color}-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
               
-              <motion.div 
-                whileHover={{ rotate: 360 }}
-                transition={{ duration: 0.6 }}
-                className={`text-3xl text-${feature.color}-600 mb-2 relative z-10`}
+              <div 
+                className={`text-3xl text-${feature.color}-600 mb-2 relative z-10 group-hover:rotate-360 transition-transform duration-600`}
               >
                 {feature.icon}
-              </motion.div>
+              </div>
               <h3 className="font-bold text-gray-900 text-lg mb-2 relative z-10">{feature.title}</h3>
               <p className="text-gray-600 relative z-10">{feature.desc}</p>
-            </motion.div>
+            </div>
           ))}
         </div>
 
         {/* Trusted section */}
-        <motion.div 
+        <div 
           ref={trustedRef}
-          initial={{ opacity: 0, y: 30 }}
-          animate={trustedInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="mt-20 pt-10 border-t border-gray-200"
+          className={`mt-20 pt-10 border-t border-gray-200 transition-all duration-700 ${isTrustedVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
         >
-          <motion.p 
-            animate={{ opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="text-gray-500 text-sm md:text-base mb-6"
+          <p 
+            className="text-gray-500 text-sm md:text-base mb-6 animate-pulse-slow"
           >
             Trusted by forward-thinking individuals and teams
-          </motion.p>
+          </p>
           <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-70">
             {trustedItems.map((item, index) => (
-              <motion.div
+              <div
                 key={item}
-                initial={{ opacity: 0, y: 20 }}
-                animate={trustedInView ? { opacity: 0.7, y: 0 } : {}}
-                transition={{ delay: index * 0.1, duration: 0.4 }}
-                whileHover={{ opacity: 1, scale: 1.1, color: "#3b82f6" }}
-                className="text-gray-700 font-semibold cursor-pointer"
+                className={`text-gray-700 font-semibold cursor-pointer transition-all duration-300 hover:opacity-100 hover:scale-110 hover:text-blue-600 ${isTrustedVisible ? 'opacity-70 translate-y-0' : 'opacity-0 translate-y-5'}`}
+                style={{ transitionDelay: `${index * 100}ms` }}
               >
                 {item}
-              </motion.div>
+              </div>
             ))}
           </div>
-        </motion.div>
+        </div>
 
       </div>
 
       {/* Scroll indicator */}
-      <motion.div 
-        animate={{ y: [0, 10, 0] }}
-        transition={{ duration: 1.5, repeat: Infinity }}
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+      <div 
+        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce-slow"
       >
         <div className="w-6 h-10 border-2 border-gray-400 rounded-full flex justify-center">
           <div className="w-1 h-3 bg-gray-400 rounded-full mt-2" />
         </div>
-      </motion.div>
+      </div>
+
+      {/* Add custom animation keyframes to your CSS or Tailwind config */}
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.5; }
+          50% { transform: translateY(-40px) translateX(20px); opacity: 1; }
+        }
+        
+        @keyframes float-slow {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes gradient {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes bounce-slow {
+          0%, 100% { transform: translate(-50%, 0); }
+          50% { transform: translate(-50%, 10px); }
+        }
+        
+        @keyframes pulse-slow {
+          0%, 100% { opacity: 0.5; }
+          50% { opacity: 1; }
+        }
+        
+        @keyframes rotate-360 {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        
+        .animate-float {
+          animation: float infinite ease-in-out;
+        }
+        
+        .animate-float-slow {
+          animation: float-slow 3s infinite ease-in-out;
+        }
+        
+        .animate-gradient {
+          animation: gradient 3s infinite linear;
+        }
+        
+        .animate-bounce-slow {
+          animation: bounce-slow 1.5s infinite ease-in-out;
+        }
+        
+        .animate-pulse-slow {
+          animation: pulse-slow 2s infinite ease-in-out;
+        }
+        
+        .group-hover\\:rotate-360:hover {
+          animation: rotate-360 0.6s ease-in-out;
+        }
+        
+        .hover\\:scale-102:hover {
+          transform: scale(1.02);
+        }
+        
+        .duration-600 {
+          transition-duration: 600ms;
+        }
+        
+        .scale-102 {
+          transform: scale(1.02);
+        }
+      `}</style>
     </section>
   );
 }
