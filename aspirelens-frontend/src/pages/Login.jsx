@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
 import axios from "axios";
-import api from "../api/api";
+import api from "../api/axiosConfig";
 import { useNavigate } from "react-router-dom";
 import AuthContext from '../context/authContext';
 
@@ -54,7 +54,7 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("https://aspirelens-backend.onrender.com/api/auth/login", {
+      const res = await api.post("/api/auth/login", {
         email: formData.email,
         password: formData.password
       });

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { User, Mail, Lock, Eye, EyeOff, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+
 import api from '../api/axiosConfig';
 
 export default function SignUp() {
