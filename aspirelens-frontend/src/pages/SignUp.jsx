@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { User, Mail, Lock, Eye, EyeOff, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-import api from '../api/axiosConfig';
+import api from '../api/api.js';
 
 export default function SignUp() {
   const navigate = useNavigate();

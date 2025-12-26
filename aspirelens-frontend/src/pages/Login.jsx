@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
 import axios from "axios";
-import api from "../api/axiosConfig";
+import api from "../api/api.js";
 import { useNavigate } from "react-router-dom";
 import AuthContext from '../context/authContext';
 
