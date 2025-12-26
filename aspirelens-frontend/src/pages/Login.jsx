@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
-import axios from "axios";
+
+import api from "./api/api.js";
 import { useNavigate } from "react-router-dom";
 import AuthContext from '../context/authContext';
 
@@ -53,7 +54,7 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", {
+      const res = await api.post("/api/auth/login", {
         email: formData.email,
         password: formData.password
       });

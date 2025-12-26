@@ -378,14 +378,14 @@ export default function SignUp() {
             </div>
 
             {/* Submit Button */}
-            {/* <button
+            <button
               type="submit"
               className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white py-3.5 rounded-xl font-semibold text-lg hover:from-blue-600 hover:to-purple-600 transform hover:-translate-y-0.5 transition-all duration-300 shadow-lg hover:shadow-xl"
             >
               Create Account
             </button>
 
-            Divider
+            {/*Divider
             <div className="relative my-8">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300"></div>
