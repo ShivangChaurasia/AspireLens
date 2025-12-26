@@ -90,7 +90,7 @@ export default function SignUp() {
       });
 
       console.log("Signup success:", res.data);
-      navigate("/verify-email-info");
+      navigate("/email-verified");
 
     } catch (error) {
       console.error("Signup Error:", error.response?.data || error);
