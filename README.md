@@ -5,6 +5,8 @@
 AspireLens transforms career counselling from generic advice to precise, data-backed recommendations. By combining timed aptitude evaluations with backend-scored analytics and AI-generated insights, we provide students with objective career direction based on their actual performance strengths and weaknesses.
 
 ---
+## Live Link: https://careerwithaspirelens.vercel.app/
+
 
 ## 🚀 Why AspireLens?
 
