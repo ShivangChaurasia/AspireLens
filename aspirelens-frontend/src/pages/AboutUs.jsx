@@ -275,6 +275,8 @@ return (
               </div>
             </div>
             
+
+            
             {/* Floating element */}
             <div className="absolute -bottom-8 -right-8 w-40 h-40 bg-gradient-to-br from-blue-400/10 to-purple-400/10 rounded-full blur-2xl animate-pulse"></div>
           </div>
