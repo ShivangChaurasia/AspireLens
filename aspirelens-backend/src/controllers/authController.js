@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import { updateUserActivity } from "../utils/updateActivity.js";
+import admin from "../config/firebase.js";
 
 /**
  * ============================================================
@@ -126,6 +127,83 @@ export const login = async (req, res) => {
   } catch (error) {
     console.error("Login Error:", error);
     return res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+//
+// ======================= GOOGLE LOGIN =======================
+//
+export const googleLogin = async (req, res) => {
+  try {
+    const { idToken } = req.body;
+    if (!idToken) {
+      return res.status(400).json({ message: "Firebase ID token required" });
+    }
+
+    // 1️⃣ Verify the Firebase ID token
+    let decoded;
+    try {
+      decoded = await admin.auth().verifyIdToken(idToken);
+    } catch (fbErr) {
+      console.error("Firebase token verification failed:", fbErr.message);
+      return res.status(401).json({ message: "Invalid Google token" });
+    }
+
+    const { uid, email, name, picture } = decoded;
+    const [firstName, ...rest] = (name || email).split(" ");
+    const lastName = rest.join(" ") || "";
+
+    // 2️⃣ Upsert user in MongoDB
+    let user = await User.findOne({ $or: [{ email }, { firebaseUid: uid }] });
+
+    if (!user) {
+      // New Google user — create in MongoDB
+      user = new User({
+        firstName,
+        lastName,
+        email,
+        firebaseUid: uid,
+        passwordHash: null,          // No password for Google users
+        role: "student",
+        isEmailVerified: true,
+        authProvider: "google",
+      });
+      await user.save();
+      console.log("✅ New Google user created in MongoDB:", email);
+    } else if (!user.firebaseUid) {
+      // Existing email user — sync Firebase UID
+      user.firebaseUid = uid;
+      await user.save();
+      console.log("✅ Synced Firebase UID for existing user:", email);
+    }
+
+    await updateUserActivity(user._id);
+
+    // 3️⃣ Issue JWT
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    return res.json({
+      message: "Google login successful",
+      token,
+      user: {
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
+        isProfileComplete: user.isProfileComplete,
+        authProvider: "google",
+      },
+    });
+
+  } catch (error) {
+    console.error("Google Login Error:", error);
+    return res.status(500).json({ message: "Server error during Google login" });
   }
 };
 
