@@ -1,6 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
-import axios from "axios";
 import api from "../api/api.js";
 import { useNavigate } from "react-router-dom";
 import AuthContext from '../context/authContext';
@@ -55,7 +54,7 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.post("https://aspirelens-backend.onrender.com/api/auth/login", {
+      const res = await api.post("/api/auth/login", {
         email: formData.email,
         password: formData.password
       });
@@ -72,10 +71,12 @@ export default function Login() {
     }
   };
 
+  
+
   const handleGoogleLogin = async () => {
     try {
       const { idToken } = await signInWithGoogle();
-      const res = await api.post("https://aspirelens-backend.onrender.com/api/auth/google-login", { idToken });
+      const res = await api.post("/api/auth/google-login", { idToken });
       localStorage.setItem("token", res.data.token);
       setUser(res.data.user);
       navigate("/home-hero");
