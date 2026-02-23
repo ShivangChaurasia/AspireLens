@@ -3,7 +3,7 @@ import { User, Mail, Lock, Eye, EyeOff, Check, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AuthContext from '../context/authContext';
 import api from '../api/api.js';
-import { signInWithGoogle } from '../firebase.js';
+import { signInWithGoogle, handleGoogleRedirectResult } from '../firebase.js';
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -35,6 +35,23 @@ export default function SignUp() {
 
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  // Handle Google redirect result on page load
+  useEffect(() => {
+    const checkRedirect = async () => {
+      try {
+        const result = await handleGoogleRedirectResult();
+        if (!result) return;
+        const res = await api.post("/api/auth/google-login", { idToken: result.idToken });
+        localStorage.setItem("token", res.data.token);
+        setUser(res.data.user);
+        navigate("/");
+      } catch (error) {
+        console.error("Google redirect result error:", error);
+      }
+    };
+    checkRedirect();
   }, []);
 
   // Load Lottie animation
@@ -106,15 +123,10 @@ export default function SignUp() {
 
   const handleGoogleSignup = async () => {
     try {
-      const { idToken } = await signInWithGoogle();
-      const res = await api.post("/api/auth/google-login", { idToken });
-      localStorage.setItem("token", res.data.token);
-      setUser(res.data.user);
-      navigate("/");
-      console.log("Google Signup Successful:", res.data);
+      await signInWithGoogle(); // triggers redirect — page will navigate away
     } catch (error) {
-      console.error("Google Signup Error:", error.response?.data || error);
-      alert(error.response?.data?.message || "Google sign-up failed. Please try again.");
+      console.error("Google Signup Error:", error);
+      alert("Google sign-up failed. Please try again.");
     }
   };
 

@@ -3,7 +3,7 @@ import { Eye, EyeOff, Mail, Lock, ArrowRight, ArrowLeft } from 'lucide-react';
 import api from "../api/api.js";
 import { useNavigate } from "react-router-dom";
 import AuthContext from '../context/authContext';
-import { signInWithGoogle } from '../firebase.js';
+import { signInWithGoogle, handleGoogleRedirectResult } from '../firebase.js';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -30,6 +30,23 @@ export default function Login() {
 
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  // Handle Google redirect result on page load
+  useEffect(() => {
+    const checkRedirect = async () => {
+      try {
+        const result = await handleGoogleRedirectResult();
+        if (!result) return;
+        const res = await api.post("/api/auth/google-login", { idToken: result.idToken });
+        localStorage.setItem("token", res.data.token);
+        setUser(res.data.user);
+        navigate("/");
+      } catch (error) {
+        console.error("Google redirect result error:", error);
+      }
+    };
+    checkRedirect();
   }, []);
 
   useEffect(() => {
@@ -79,15 +96,10 @@ export default function Login() {
 
   const handleGoogleLogin = async () => {
     try {
-      const { idToken } = await signInWithGoogle();
-      const res = await api.post("/api/auth/google-login", { idToken });
-      localStorage.setItem("token", res.data.token);
-      setUser(res.data.user);
-      navigate("/");
-      console.log("Google Login Successful:", res.data);
+      await signInWithGoogle(); // triggers redirect — page will navigate away
     } catch (error) {
-      console.error("Google Login Error:", error.response?.data || error);
-      alert(error.response?.data?.message || "Google login failed. Please try again.");
+      console.error("Google Login Error:", error);
+      alert("Google login failed. Please try again.");
     }
   };
 

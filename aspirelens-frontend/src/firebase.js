@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult } from "firebase/auth";
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -16,10 +16,20 @@ export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 
 /**
- * Trigger Google Sign-In popup and return the Firebase ID token.
+ * Initiate Google Sign-In via redirect (avoids popup-blocked / COOP issues).
+ * The page will navigate away; call handleGoogleRedirectResult() after it returns.
  */
-export const signInWithGoogle = async () => {
-    const result = await signInWithPopup(auth, googleProvider);
+export const signInWithGoogle = () => {
+    return signInWithRedirect(auth, googleProvider);
+};
+
+/**
+ * Call this on page load to retrieve the result after the Google redirect returns.
+ * Returns { idToken, user } on success, or null if no redirect result is pending.
+ */
+export const handleGoogleRedirectResult = async () => {
+    const result = await getRedirectResult(auth);
+    if (!result) return null;
     const idToken = await result.user.getIdToken();
     return { idToken, user: result.user };
 };
