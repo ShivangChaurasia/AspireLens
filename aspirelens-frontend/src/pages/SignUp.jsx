@@ -222,10 +222,10 @@ export default function SignUp() {
 
       </div>
 
-      <div className="relative z-10 max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+      <div className="relative z-10 max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-center px-2 sm:px-0">
 
         {/* Left Side - Signup Form */}
-        <div className="bg-white/90 dark:bg-gray-800 backdrop-blur-sm rounded-3xl shadow-2xl p-8 md:p-12 max-w-md mx-auto w-full order-2 lg:order-1 transition-colors duration-300">
+        <div className="bg-white/90 dark:bg-gray-800 backdrop-blur-sm rounded-3xl shadow-2xl p-6 sm:p-8 md:p-12 max-w-md mx-auto w-full order-2 lg:order-1 transition-colors duration-300">
           <div className="text-center mb-10">
             <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Begin Your Journey</h3>
             <p className="text-gray-500 dark:text-gray-400">Join thousands exploring smarter with AspireLens</p>
@@ -233,7 +233,7 @@ export default function SignUp() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Name Fields */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   First Name
@@ -461,7 +461,7 @@ export default function SignUp() {
         </div>
 
         {/* Right Side - Benefits with Animation */}
-        <div className="order-1 lg:order-2">
+        <div className="order-1 lg:order-2 hidden lg:block">
           <div className="max-w-lg ml-auto">
             <div className="flex items-center mb-8">
               <div className="h-12 w-12 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center mr-4">

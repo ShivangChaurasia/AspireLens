@@ -227,7 +227,7 @@ export default function Login() {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+      <div className="relative z-10 max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-center px-2 sm:px-0">
 
         {/* Left Side - Brand/Info with Animation */}
         <div className="hidden lg:block">
@@ -286,7 +286,7 @@ export default function Login() {
         </div>
 
         {/* Right Side - Login Form */}
-        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 md:p-12 max-w-md mx-auto w-full transition-colors duration-300">
+        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-6 sm:p-8 md:p-12 max-w-md mx-auto w-full transition-colors duration-300">
           <div className="text-center mb-10">
             <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Welcome Back</h3>
             <p className="text-gray-500 dark:text-gray-400">Sign in to continue your exploration</p>

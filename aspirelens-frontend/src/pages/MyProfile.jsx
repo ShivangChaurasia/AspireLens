@@ -416,7 +416,7 @@ export default function MyProfile() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 p-4 md:p-8 transition-colors duration-300">
       {showPasswordModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl w-full max-w-md border border-gray-100 dark:border-gray-700">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl w-full max-w-md mx-4 sm:mx-auto border border-gray-100 dark:border-gray-700">
             <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">Change Password</h2>
 
             {passwordError && (
@@ -541,7 +541,7 @@ export default function MyProfile() {
         {/* 2. Profile Details Section */}
         {/* --------------------------- */}
         <section className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-6 md:p-8 border border-gray-100 dark:border-gray-700 transition-colors duration-300">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div className="flex items-center gap-3">
               <div className="h-12 w-12 rounded-xl bg-gradient-to-r from-blue-100 to-cyan-100 flex items-center justify-center">
                 <User className="h-6 w-6 text-blue-600" />
@@ -561,7 +561,7 @@ export default function MyProfile() {
                 Edit Profile
               </button>
             ) : (
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <button
                   onClick={handleCancelEdit}
                   className="flex items-center gap-2 px-4 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold rounded-xl border border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
