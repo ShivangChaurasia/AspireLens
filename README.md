@@ -58,6 +58,7 @@ Our system treats career discovery as an engineering problem, applying data vali
 - **User Analytics**: Performance trends and platform usage statistics
 - **Role Management**: Granular permission controls for administrative staff
 - **Content Moderation**: Ensure assessment quality and appropriateness
+- **Responsive & Adaptive UI**: Fully compatible with mobile, tablet, and desktop devices with a mobile-first navigation system.
 
 ---
 
@@ -220,7 +221,7 @@ Validation Business Logic Data Persistence Intelligence Layer
 |   |   |   |-- AdminAuth.json
 |   |   |   |-- Dashboard_screen.json
 |   |   |   |-- Login.json
-|   |   |   |-- SighUp.json
+|   |   |   |-- SignUp.json
 |   |   |   `-- success.json
 |   |   |-- assets
 |   |   |   |-- aspirelens-logo.png
@@ -245,6 +246,7 @@ Validation Business Logic Data Persistence Intelligence Layer
 |   |       |-- Dashboard.jsx
 |   |       |-- HeroHome.jsx
 |   |       |-- HeroSection.jsx
+|   |       |-- HomePage.jsx
 |   |       |-- Login.jsx
 |   |       |-- MyProfile.jsx
 |   |       |-- SignUp.jsx
@@ -259,7 +261,7 @@ Validation Business Logic Data Persistence Intelligence Layer
 |   `-- vite.config.js
 `-- structure.txt
 
-20 directories, 80 files
+20 directories, 85 files
 ```
 
 ---

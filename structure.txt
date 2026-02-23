@@ -61,7 +61,7 @@
 |   |   |   |-- AdminAuth.json
 |   |   |   |-- Dashboard_screen.json
 |   |   |   |-- Login.json
-|   |   |   |-- SighUp.json
+|   |   |   |-- SignUp.json
 |   |   |   `-- success.json
 |   |   |-- assets
 |   |   |   |-- aspirelens-logo.png
@@ -86,6 +86,7 @@
 |   |       |-- Dashboard.jsx
 |   |       |-- HeroHome.jsx
 |   |       |-- HeroSection.jsx
+|   |       |-- HomePage.jsx
 |   |       |-- Login.jsx
 |   |       |-- MyProfile.jsx
 |   |       |-- SignUp.jsx
@@ -100,4 +101,4 @@
 |   `-- vite.config.js
 `-- structure.txt
 
-20 directories, 80 files
+20 directories, 85 files
