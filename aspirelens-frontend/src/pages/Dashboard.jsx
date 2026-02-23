@@ -3,14 +3,14 @@ import api from "../api/api";
 import AuthContext from "../context/authContext";
 import { Link } from "react-router-dom";
 
-import { 
-  TrendingUp, 
-  Target, 
-  BookOpen, 
-  Clock, 
-  Brain, 
-  Rocket, 
-  Sparkles, 
+import {
+  TrendingUp,
+  Target,
+  BookOpen,
+  Clock,
+  Brain,
+  Rocket,
+  Sparkles,
   BarChart3,
   ChevronRight,
   CheckCircle,
@@ -44,7 +44,7 @@ export default function Dashboard() {
       );
 
       const userData = res.data;
-      
+
       // Calculate stats from user data
       setStats({
         profileCompletion: userData.profile?.profileCompletion || 0,
@@ -78,10 +78,10 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex items-center justify-center transition-colors duration-300">
         <div className="text-center">
           <Loader2 className="h-12 w-12 text-blue-500 animate-spin mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-700">Loading your dashboard...</h2>
+          <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-300">Loading your dashboard...</h2>
         </div>
       </div>
     );
@@ -96,7 +96,7 @@ export default function Dashboard() {
       const now = new Date();
       const lastActive = new Date(dateString);
       const diffHours = Math.floor((now - lastActive) / (1000 * 60 * 60));
-      
+
       if (diffHours === 0) return "Just now";
       if (diffHours === 1) return "1 hour ago";
       if (diffHours < 24) return `${diffHours} hours ago`;
@@ -107,7 +107,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 p-4 md:p-8 transition-colors duration-300">
       <div className="max-w-7xl mx-auto space-y-8">
 
         {/* ---------------------- */}
@@ -119,14 +119,14 @@ export default function Dashboard() {
               <Sparkles className="h-4 w-4 text-white" />
               <span className="text-white text-sm font-medium">Welcome back</span>
             </div>
-            
+
             <h1 className="text-3xl md:text-5xl font-bold text-white mb-3">
               Hello, {user?.firstName || "Explorer"}! 👋
             </h1>
             <p className="text-blue-100 text-lg md:text-xl max-w-2xl">
               Your journey to smarter career decisions continues. Here's your Dashboard.
             </p>
-            
+
             <div className="flex items-center gap-4 mt-8">
               <div className="flex items-center gap-2 text-white/90">
                 <div className="h-2 w-2 rounded-full bg-white animate-pulse" />
@@ -145,7 +145,7 @@ export default function Dashboard() {
               )}
             </div>
           </div>
-          
+
           {/* Decorative elements */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-32 translate-x-32" />
           <div className="absolute bottom-0 left-0 w-40 h-40 bg-cyan-300/10 rounded-full -translate-x-20 translate-y-20" />
@@ -155,57 +155,57 @@ export default function Dashboard() {
         {/* 3. Stats Section - Enhanced */}
         {/* ---------------------- */}
         <section className="space-y-6">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
             Your Progress Dashboard
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-            <div className="group bg-gradient-to-br from-blue-50 to-white p-6 rounded-2xl border border-blue-100 hover:border-blue-200 transition-all duration-300 hover:shadow-xl">
+            <div className="group bg-gradient-to-br from-blue-50 to-white dark:from-gray-800 dark:to-gray-700 p-6 rounded-2xl border border-blue-100 dark:border-gray-600 hover:border-blue-200 dark:hover:border-blue-500 transition-all duration-300 hover:shadow-xl">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-700">Profile Completion</h3>
-                <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <h3 className="font-semibold text-gray-700 dark:text-gray-300">Profile Completion</h3>
+                <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
                   <CheckCircle className="h-5 w-5 text-blue-600" />
                 </div>
               </div>
               <div className="mb-3">
-                <div className="text-3xl font-bold text-gray-900">
+                <div className="text-3xl font-bold text-gray-900 dark:text-white">
                   {profileCompletion}%
                 </div>
-                <div className="text-sm text-gray-500 mt-1">
-                  {profileCompletion < 50 ? "Let's get started!" : 
-                   profileCompletion < 80 ? "Great progress!" : 
-                   profileCompletion < 100 ? "Almost there!" : 
-                   "Perfect! 🎉"}
+                <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  {profileCompletion < 50 ? "Let's get started!" :
+                    profileCompletion < 80 ? "Great progress!" :
+                      profileCompletion < 100 ? "Almost there!" :
+                        "Perfect! 🎉"}
                 </div>
               </div>
-              <div className="h-2 bg-blue-100 rounded-full overflow-hidden">
-                <div 
+              <div className="h-2 bg-blue-100 dark:bg-gray-600 rounded-full overflow-hidden">
+                <div
                   className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full transition-all duration-1000 ease-out"
                   style={{ width: `${profileCompletion}%` }}
                 />
               </div>
             </div>
 
-            <div className="group bg-gradient-to-br from-purple-50 to-white p-6 rounded-2xl border border-purple-100 hover:border-purple-200 transition-all duration-300 hover:shadow-xl">
+            <div className="group bg-gradient-to-br from-purple-50 to-white dark:from-gray-800 dark:to-gray-700 p-6 rounded-2xl border border-purple-100 dark:border-gray-600 hover:border-purple-200 dark:hover:border-purple-500 transition-all duration-300 hover:shadow-xl">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-700">Tests Taken</h3>
-                <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <h3 className="font-semibold text-gray-700 dark:text-gray-300">Tests Taken</h3>
+                <div className="h-10 w-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
                   <BarChart3 className="h-5 w-5 text-purple-600" />
                 </div>
               </div>
               <div className="mb-3">
-                <div className="text-3xl font-bold text-gray-900">
+                <div className="text-3xl font-bold text-gray-900 dark:text-white">
                   {testsTaken}
                 </div>
-                <div className="text-sm text-gray-500 mt-1">
-                  {testsTaken === 0 ? "Ready for your first test?" : 
-                   testsTaken === 1 ? "Great start!" : 
-                   "Excellent progress!"}
+                <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  {testsTaken === 0 ? "Ready for your first test?" :
+                    testsTaken === 1 ? "Great start!" :
+                      "Excellent progress!"}
                 </div>
               </div>
               <div className="flex items-center gap-1">
                 {[...Array(Math.min(testsTaken, 5))].map((_, i) => (
-                  <div 
+                  <div
                     key={i}
                     className="h-2 flex-1 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full group-hover:opacity-80 transition-opacity"
                   />
@@ -240,26 +240,26 @@ export default function Dashboard() {
               </div>
             </div> */}
 
-            <div className="group bg-gradient-to-br from-amber-50 to-white p-6 rounded-2xl border border-amber-100 hover:border-amber-200 transition-all duration-300 hover:shadow-xl">
+            <div className="group bg-gradient-to-br from-amber-50 to-white dark:from-gray-800 dark:to-gray-700 p-6 rounded-2xl border border-amber-100 dark:border-gray-600 hover:border-amber-200 dark:hover:border-amber-500 transition-all duration-300 hover:shadow-xl">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-700">Daily Streak</h3>
-                <div className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <h3 className="font-semibold text-gray-700 dark:text-gray-300">Daily Streak</h3>
+                <div className="h-10 w-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
                   <Award className="h-5 w-5 text-amber-600" />
                 </div>
               </div>
               <div className="mb-3">
-                <div className="text-3xl font-bold text-gray-900">
+                <div className="text-3xl font-bold text-gray-900 dark:text-white">
                   {dailyStreak} {dailyStreak === 1 ? "day" : "days"}
                 </div>
-                <div className="text-sm text-gray-500 mt-1">
+                <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                   {dailyStreak === 0 ? "Start your streak today!" :
-                   dailyStreak < 3 ? "Keep it up! 🔥" :
-                   "Impressive streak! 🌟"}
+                    dailyStreak < 3 ? "Keep it up! 🔥" :
+                      "Impressive streak! 🌟"}
                 </div>
               </div>
               <div className="flex items-center">
                 {[...Array(Math.min(dailyStreak, 7))].map((_, i) => (
-                  <div 
+                  <div
                     key={i}
                     className="h-2 w-2 rounded-full bg-gradient-to-r from-amber-400 to-orange-400 mx-0.5 group-hover:scale-125 transition-transform"
                   />
@@ -273,28 +273,28 @@ export default function Dashboard() {
         {/* 4. Feature Cards - Enhanced */}
         {/* ---------------------- */}
         <section className="space-y-6">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
             Explore AspireLens Features
           </h2>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Career Assessment Card */}
-            <div className="group bg-gradient-to-br from-white to-blue-50 p-8 rounded-3xl border border-blue-100 hover:shadow-2xl hover:shadow-blue-50 transition-all duration-500 hover:-translate-y-1">
+            <div className="group bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-gray-700 p-8 rounded-3xl border border-blue-100 dark:border-gray-600 hover:shadow-2xl hover:shadow-blue-50 transition-all duration-500 hover:-translate-y-1">
               <div className="flex items-start justify-between mb-6">
                 <div className="h-14 w-14 rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center">
                   <Brain className="h-7 w-7 text-white" />
                 </div>
-                <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 rounded-full text-xs font-medium">
                   Most Popular
                 </span>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
                 Career Assessment
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
                 Analyze your interests, strengths, and future career opportunities with AI-powered insights.
               </p>
-              
+
               {profileCompletion < 80 ? (
                 <div className="space-y-3">
                   <div className="text-sm text-amber-600 bg-amber-50 p-3 rounded-lg border border-amber-200">
@@ -316,28 +316,28 @@ export default function Dashboard() {
             </div>
 
             {/* Goal Suggestions Card */}
-            <div className="group bg-gradient-to-br from-white to-amber-50 p-8 rounded-3xl border border-amber-100 hover:shadow-2xl hover:shadow-amber-50 transition-all duration-500 hover:-translate-y-1">
+            <div className="group bg-gradient-to-br from-white to-amber-50 dark:from-gray-800 dark:to-gray-700 p-8 rounded-3xl border border-amber-100 dark:border-gray-600 hover:shadow-2xl hover:shadow-amber-50 transition-all duration-500 hover:-translate-y-1">
               <div className="flex items-start justify-between mb-6">
                 <div className="h-14 w-14 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 flex items-center justify-center">
                   <Target className="h-7 w-7 text-white" />
                 </div>
-                <span className="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">
+                <span className="px-3 py-1 bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 rounded-full text-xs font-medium">
                   {testsTaken > 0 ? "Coming Soon" : "Coming Soon"}
                 </span>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
                 Goal Suggestions
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
                 Get AI-powered goals based on your assessment results and career interests.
               </p>
-              
+
               {testsTaken > 0 ? (
                 <button className="mt-6 w-full px-6 py-3 bg-gradient-to-r from-orange-300 to-orange-300 text-white font-semibold rounded-xl hover:from-amber-700 hover:to-orange-700 transform hover:-translate-y-0.5 transition-all duration-300 shadow-lg hover:shadow-xl">
                   Coming Soon
                 </button>
               ) : (
-                <div className="text-sm text-gray-500 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                <div className="text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600">
                   Complete a career assessment first to get personalized goals
                 </div>
               )}
@@ -350,34 +350,34 @@ export default function Dashboard() {
         {/* ---------------------- */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Link to="/profile">
-            <div className="group bg-white p-6 rounded-2xl border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all cursor-pointer">
+            <div className="group bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-500 hover:shadow-lg transition-all cursor-pointer">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-semibold text-gray-900 group-hover:text-blue-600">My Profile</h4>
-                  <p className="text-sm text-gray-500 mt-1">Update your information</p>
+                  <h4 className="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600">My Profile</h4>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Update your information</p>
                 </div>
                 <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-blue-500 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
           </Link>
-          
+
           <Link to="/start-test">
-            <div className="group bg-white p-6 rounded-2xl border border-gray-200 hover:border-green-300 hover:shadow-lg transition-all cursor-pointer">
+            <div className="group bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 hover:border-green-300 dark:hover:border-green-500 hover:shadow-lg transition-all cursor-pointer">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-semibold text-gray-900 group-hover:text-green-600">Start Test</h4>
-                  <p className="text-sm text-gray-500 mt-1">Begin assessment</p>
+                  <h4 className="font-semibold text-gray-900 dark:text-white group-hover:text-green-600">Start Test</h4>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Begin assessment</p>
                 </div>
                 <Rocket className="h-5 w-5 text-gray-400 group-hover:text-green-500 group-hover:rotate-12 transition-transform" />
               </div>
             </div>
           </Link>
-          
-          <div className="group bg-white p-6 rounded-2xl border border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all cursor-pointer">
+
+          <div className="group bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-500 hover:shadow-lg transition-all cursor-pointer">
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="font-semibold text-gray-900 group-hover:text-purple-600">Learning Resources</h4>
-                <p className="text-sm text-gray-500 mt-1">Explore courses</p>
+                <h4 className="font-semibold text-gray-900 dark:text-white group-hover:text-purple-600">Learning Resources</h4>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Explore courses</p>
               </div>
               <BookOpen className="h-5 w-5 text-gray-400 group-hover:text-purple-500 group-hover:scale-110 transition-transform" />
             </div>

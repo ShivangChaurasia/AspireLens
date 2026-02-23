@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, ArrowRight, ArrowLeft } from 'lucide-react';
 import api from "../api/api.js";
 import { useNavigate } from "react-router-dom";
 import AuthContext from '../context/authContext';
@@ -63,7 +63,7 @@ export default function Login() {
 
       localStorage.setItem("token", res.data.token);
       setUser(res.data.user);
-      navigate("/home-hero");
+      navigate("/");
 
       console.log("Login Successful:", res.data);
 
@@ -83,7 +83,7 @@ export default function Login() {
       const res = await api.post("/api/auth/google-login", { idToken });
       localStorage.setItem("token", res.data.token);
       setUser(res.data.user);
-      navigate("/home-hero");
+      navigate("/");
       console.log("Google Login Successful:", res.data);
     } catch (error) {
       console.error("Google Login Error:", error.response?.data || error);
@@ -92,7 +92,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-white flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-white dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex items-center justify-center p-4 relative overflow-hidden transition-colors duration-300">
 
       {/* Animated Background Elements */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -241,12 +241,12 @@ export default function Login() {
               </h1>
             </div>
 
-            <h2 className="text-4xl font-bold text-gray-900">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white">
               See Your World
               <span className="block text-blue-600">More Clearly</span>
             </h2>
 
-            <p className="text-gray-600 text-lg">
+            <p className="text-gray-600 dark:text-gray-300 text-lg">
               Access personalized insights, smart analytics, and tools that help you navigate your educational journey with precision.
             </p>
 
@@ -286,16 +286,16 @@ export default function Login() {
         </div>
 
         {/* Right Side - Login Form */}
-        <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 max-w-md mx-auto w-full">
+        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 md:p-12 max-w-md mx-auto w-full transition-colors duration-300">
           <div className="text-center mb-10">
-            <h3 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h3>
-            <p className="text-gray-500">Sign in to continue your exploration</p>
+            <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Welcome Back</h3>
+            <p className="text-gray-500 dark:text-gray-400">Sign in to continue your exploration</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Field */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Email Address
               </label>
               <div className="relative">
@@ -306,7 +306,7 @@ export default function Login() {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  className="pl-10 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400"
                   placeholder="you@example.com"
                   required
                 />
@@ -315,7 +315,7 @@ export default function Login() {
 
             {/* Password Field */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Password
               </label>
               <div className="relative">
@@ -326,7 +326,7 @@ export default function Login() {
                   type={showPassword ? "text" : "password"}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="pl-10 pr-10 w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  className="pl-10 pr-10 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400"
                   placeholder="••••••••"
                   required
                 />
@@ -353,7 +353,7 @@ export default function Login() {
                   onChange={(e) => setFormData({ ...formData, rememberMe: e.target.checked })}
                   className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500 border-gray-300"
                 />
-                <span className="ml-2 text-sm text-gray-700">Remember me</span>
+                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Remember me</span>
               </label>
               <a href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-800 font-medium">
                 Forgot password? Contact<br /> careerwith.aspirelens@gmail.com
@@ -384,16 +384,16 @@ export default function Login() {
 
             {/* Divider */}
             <div className="flex items-center gap-4">
-              <div className="flex-1 h-px bg-gray-200" />
+              <div className="flex-1 h-px bg-gray-200 dark:bg-gray-600" />
               <span className="text-sm text-gray-400">or continue with</span>
-              <div className="flex-1 h-px bg-gray-200" />
+              <div className="flex-1 h-px bg-gray-200 dark:bg-gray-600" />
             </div>
 
             {/* Google Sign-In Button */}
             <button
               type="button"
               onClick={handleGoogleLogin}
-              className="w-full flex items-center justify-center gap-3 px-4 py-3.5 border-2 border-gray-200 rounded-xl font-semibold text-gray-700 hover:border-blue-400 hover:bg-blue-50 transition-all duration-300 shadow-sm hover:shadow-md"
+              className="w-full flex items-center justify-center gap-3 px-4 py-3.5 border-2 border-gray-200 dark:border-gray-600 rounded-xl font-semibold text-gray-700 dark:text-gray-200 hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 transition-all duration-300 shadow-sm hover:shadow-md"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -406,12 +406,24 @@ export default function Login() {
 
             {/* Sign Up Link */}
             <div className="text-center pt-2">
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 Don't have an account?{' '}
-                <a href="/signup" className="text-blue-600 hover:text-blue-800 font-semibold">
+                <a href="/signup" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-semibold">
                   Create one now
                 </a>
               </p>
+            </div>
+
+            {/* Back to Home */}
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => navigate('/')}
+                className="inline-flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to Home
+              </button>
             </div>
           </form>
         </div>

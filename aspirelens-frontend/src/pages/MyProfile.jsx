@@ -1,7 +1,7 @@
 import { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../context/authContext";
-import { 
+import {
   User,
   Mail,
   Calendar,
@@ -23,7 +23,7 @@ import {
 import api from "../api/api";
 
 export default function MyProfile() {
-  const {logout } = useContext(AuthContext);
+  const { logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -62,16 +62,16 @@ export default function MyProfile() {
       const lastActive = new Date(dateString);
       const diffTime = Math.abs(now - lastActive);
       const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-      
+
       if (diffDays === 0) return "Today";
       if (diffDays === 1) return "Yesterday";
       if (diffDays < 7) return `${diffDays} days ago`;
-      
+
       return lastActive.toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric'
       });
-    } catch{
+    } catch {
       return "Unknown";
     }
   };
@@ -80,11 +80,11 @@ export default function MyProfile() {
     if (!dateString) return "Recently";
     try {
       const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', { 
-        month: 'long', 
-        year: 'numeric' 
+      return date.toLocaleDateString('en-US', {
+        month: 'long',
+        year: 'numeric'
       });
-    } catch{
+    } catch {
       return "Recently";
     }
   };
@@ -109,7 +109,7 @@ export default function MyProfile() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const token = getToken();
       if (!token) {
         setError("Please login to view your profile");
@@ -118,18 +118,18 @@ export default function MyProfile() {
       }
 
       const res = await api.get("/api/user/me", {
-        headers: { 
+        headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
-      
+
       const data = res.data;
       setProfileData(data);
-      
+
       const completion = data.profile?.profileCompletion || 0;
       setProfileCompletion(completion);
-      
+
       // Fill edit form - USE ONLY PROFILE FIELDS
       setEditForm({
         firstName: data.firstName || "",
@@ -140,7 +140,7 @@ export default function MyProfile() {
         stream: data.profile?.stream || "", // FIXED: Use only profile.stream
         interests: data.profile?.interests?.join(", ") || "" // FIXED: Use only profile.interests
       });
-      
+
     } catch (error) {
       console.error("Profile fetch error:", error);
       if (error.response?.status === 401) {
@@ -156,7 +156,7 @@ export default function MyProfile() {
 
   useEffect(() => {
     fetchProfile();
-  },[]);
+  }, []);
 
   // Validate form
   const validateForm = () => {
@@ -169,7 +169,7 @@ export default function MyProfile() {
         errors.age = "Age must be between 12 and 100";
       }
     }
-    
+
     // Validate education level and stage
     if (!editForm.educationLevel) {
       errors.educationLevel = "Education level is required";
@@ -178,7 +178,7 @@ export default function MyProfile() {
     } else if (["Undergraduate", "Postgraduate"].includes(editForm.educationLevel) && !["1", "2", "3", "4"].includes(editForm.educationStage)) {
       errors.educationStage = "UG/PG students must select a valid year";
     }
-    
+
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -218,7 +218,7 @@ export default function MyProfile() {
       };
 
       const res = await api.post("/api/user/update-profile", updateData, {
-        headers: { 
+        headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
@@ -340,11 +340,11 @@ export default function MyProfile() {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex items-center justify-center transition-colors duration-300">
         <div className="text-center">
           <Loader2 className="h-12 w-12 text-blue-500 animate-spin mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-700">Loading your profile...</h2>
-          <p className="text-gray-500 mt-2">Please wait</p>
+          <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-300">Loading your profile...</h2>
+          <p className="text-gray-500 dark:text-gray-400 mt-2">Please wait</p>
         </div>
       </div>
     );
@@ -353,12 +353,12 @@ export default function MyProfile() {
   // Error state - No token
   if (error && !getToken()) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 flex items-center justify-center p-4">
-        <div className="text-center max-w-md mx-auto p-8 bg-white rounded-3xl shadow-2xl border border-gray-100">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex items-center justify-center p-4 transition-colors duration-300">
+        <div className="text-center max-w-md mx-auto p-8 bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-700">
           <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Authentication Required</h2>
-          <p className="text-gray-600 mb-6">{error}</p>
-          <button 
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Authentication Required</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">{error}</p>
+          <button
             onClick={handleLoginRedirect}
             className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-colors"
           >
@@ -373,12 +373,12 @@ export default function MyProfile() {
   // Error state - Other errors
   if (error && !profileData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex items-center justify-center transition-colors duration-300">
         <div className="text-center max-w-md mx-auto p-6">
           <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Unable to Load Profile</h2>
-          <p className="text-gray-600 mb-6">{error}</p>
-          <button 
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Unable to Load Profile</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">{error}</p>
+          <button
             onClick={fetchProfile}
             className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-colors"
           >
@@ -391,7 +391,7 @@ export default function MyProfile() {
 
   // Get education stage options based on level
   const getEducationStageOptions = (level) => {
-    switch(level) {
+    switch (level) {
       case "School":
         return [
           { value: "", label: "Select Class" },
@@ -413,56 +413,56 @@ export default function MyProfile() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 p-4 md:p-8">
-        {showPasswordModal && (
-          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md">
-              <h2 className="text-xl font-bold mb-4 text-gray-800">Change Password</h2>
-      
-              {passwordError && (
-                <p className="text-red-500 text-sm mb-2">{passwordError}</p>
-              )}
-              {passwordSuccess && (
-                <p className="text-green-600 text-sm mb-2">{passwordSuccess}</p>
-              )}
-      
-              <input
-                type="password"
-                placeholder="Old Password"
-                value={oldPassword}
-                onChange={(e) => setOldPassword(e.target.value)}
-                className="w-full mb-3 px-3 py-2 border rounded-lg"
-              />
-      
-              <input
-                type="password"
-                placeholder="New Password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full mb-4 px-3 py-2 border rounded-lg"
-              />
-      
-              <div className="flex justify-end gap-3">
-                <button
-                  onClick={() => setShowPasswordModal(false)}
-                  className="px-4 py-2 bg-gray-200 rounded-lg"
-                >
-                  Cancel
-                </button>
-      
-                <button
-                  onClick={handlePasswordChange}
-                  disabled={changingPassword}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg"
-                >
-                  {changingPassword ? "Saving..." : "Change Password"}
-                </button>
-              </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 p-4 md:p-8 transition-colors duration-300">
+      {showPasswordModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl w-full max-w-md border border-gray-100 dark:border-gray-700">
+            <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">Change Password</h2>
+
+            {passwordError && (
+              <p className="text-red-500 text-sm mb-2">{passwordError}</p>
+            )}
+            {passwordSuccess && (
+              <p className="text-green-600 text-sm mb-2">{passwordSuccess}</p>
+            )}
+
+            <input
+              type="password"
+              placeholder="Old Password"
+              value={oldPassword}
+              onChange={(e) => setOldPassword(e.target.value)}
+              className="w-full mb-3 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400"
+            />
+
+            <input
+              type="password"
+              placeholder="New Password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="w-full mb-4 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400"
+            />
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowPasswordModal(false)}
+                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handlePasswordChange}
+                disabled={changingPassword}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+              >
+                {changingPassword ? "Saving..." : "Change Password"}
+              </button>
             </div>
           </div>
-        )}
+        </div>
+      )}
       <div className="max-w-6xl mx-auto space-y-8">
-        
+
         {/* Error Alert */}
         {error && (
           <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
@@ -474,13 +474,13 @@ export default function MyProfile() {
             </div>
           </div>
         )}
-        
+
         {/* --------------------------- */}
         {/* 1. Profile Header */}
         {/* --------------------------- */}
         <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-500 p-8 md:p-10 shadow-2xl">
           <div className="flex flex-col md:flex-row items-start md:items-center gap-8 relative z-10">
-            
+
             {/* Avatar */}
             <div className="relative group">
               <div className="h-32 w-32 rounded-full bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-sm border-4 border-white/30 flex items-center justify-center shadow-2xl">
@@ -488,8 +488,8 @@ export default function MyProfile() {
                   {getUserInitials()}
                 </div>
               </div>
-              
-              <button 
+
+              <button
                 onClick={() => setIsEditing(true)}
                 className="absolute bottom-2 right-2 h-10 w-10 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
               >
@@ -510,7 +510,7 @@ export default function MyProfile() {
                   </div>
                 )}
               </div>
-              
+
               <div className="flex flex-wrap items-center gap-4 text-white/90 mb-4">
                 <div className="flex items-center gap-2">
                   <Mail className="h-5 w-5" />
@@ -540,36 +540,36 @@ export default function MyProfile() {
         {/* --------------------------- */}
         {/* 2. Profile Details Section */}
         {/* --------------------------- */}
-        <section className="bg-white rounded-3xl shadow-xl p-6 md:p-8 border border-gray-100">
+        <section className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-6 md:p-8 border border-gray-100 dark:border-gray-700 transition-colors duration-300">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
               <div className="h-12 w-12 rounded-xl bg-gradient-to-r from-blue-100 to-cyan-100 flex items-center justify-center">
                 <User className="h-6 w-6 text-blue-600" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Personal Details</h2>
-                <p className="text-gray-500">Your basic information and preferences</p>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Personal Details</h2>
+                <p className="text-gray-500 dark:text-gray-400">Your basic information and preferences</p>
               </div>
             </div>
-            
+
             {!isEditing ? (
-              <button 
+              <button
                 onClick={() => setIsEditing(true)}
-                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-600 font-semibold rounded-xl border border-blue-200 hover:bg-blue-100 transition-colors"
+                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/30 dark:to-cyan-900/30 text-blue-600 dark:text-blue-300 font-semibold rounded-xl border border-blue-200 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
               >
                 <Edit3 className="h-4 w-4" />
                 Edit Profile
               </button>
             ) : (
               <div className="flex gap-2">
-                <button 
+                <button
                   onClick={handleCancelEdit}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 font-semibold rounded-xl border border-gray-300 hover:bg-gray-200 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold rounded-xl border border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                 >
                   <X className="h-4 w-4" />
                   Cancel
                 </button>
-                <button 
+                <button
                   onClick={handleSaveProfile}
                   disabled={saving}
                   className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold rounded-xl hover:from-green-600 hover:to-emerald-600 transition-colors disabled:opacity-50"
@@ -588,24 +588,23 @@ export default function MyProfile() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Personal Info */}
             <div className="space-y-6">
-              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 <User className="h-5 w-5 text-blue-500" />
                 Personal Information
               </h3>
-              
+
               <div className="space-y-4">
                 {/* First Name */}
-                <div className="bg-gradient-to-r from-gray-50 to-white p-4 rounded-xl border border-gray-200">
-                  <label className="text-sm font-medium text-gray-500 mb-1 block">First Name *</label>
+                <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600">
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1 block">First Name *</label>
                   {isEditing ? (
                     <div>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={editForm.firstName}
-                        onChange={(e) => setEditForm({...editForm, firstName: e.target.value})}
-                        className={`w-full px-3 py-2 bg-white border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                          formErrors.firstName ? 'border-red-300' : 'border-gray-300'
-                        }`}
+                        onChange={(e) => setEditForm({ ...editForm, firstName: e.target.value })}
+                        className={`w-full px-3 py-2 bg-white border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${formErrors.firstName ? 'border-red-300' : 'border-gray-300'
+                          }`}
                         placeholder="Enter first name"
                       />
                       {formErrors.firstName && (
@@ -613,24 +612,23 @@ export default function MyProfile() {
                       )}
                     </div>
                   ) : (
-                    <p className="text-lg font-medium text-gray-900">
+                    <p className="text-lg font-medium text-gray-900 dark:text-white">
                       {displayValue(profileData?.firstName)}
                     </p>
                   )}
                 </div>
 
                 {/* Last Name */}
-                <div className="bg-gradient-to-r from-gray-50 to-white p-4 rounded-xl border border-gray-200">
-                  <label className="text-sm font-medium text-gray-500 mb-1 block">Last Name *</label>
+                <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600">
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1 block">Last Name *</label>
                   {isEditing ? (
                     <div>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={editForm.lastName}
-                        onChange={(e) => setEditForm({...editForm, lastName: e.target.value})}
-                        className={`w-full px-3 py-2 bg-white border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                          formErrors.lastName ? 'border-red-300' : 'border-gray-300'
-                        }`}
+                        onChange={(e) => setEditForm({ ...editForm, lastName: e.target.value })}
+                        className={`w-full px-3 py-2 bg-white border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${formErrors.lastName ? 'border-red-300' : 'border-gray-300'
+                          }`}
                         placeholder="Enter last name"
                       />
                       {formErrors.lastName && (
@@ -638,35 +636,34 @@ export default function MyProfile() {
                       )}
                     </div>
                   ) : (
-                    <p className="text-lg font-medium text-gray-900">
+                    <p className="text-lg font-medium text-gray-900 dark:text-white">
                       {displayValue(profileData?.lastName)}
                     </p>
                   )}
                 </div>
 
                 {/* Email */}
-                <div className="bg-gradient-to-r from-gray-50 to-white p-4 rounded-xl border border-gray-200">
-                  <label className="text-sm font-medium text-gray-500 mb-1 block">Email Address</label>
+                <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600">
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1 block">Email Address</label>
                   <div className="flex items-center gap-2">
                     <Mail className="h-5 w-5 text-gray-400" />
-                    <p className="text-lg font-medium text-gray-900">
+                    <p className="text-lg font-medium text-gray-900 dark:text-white">
                       {profileData?.email}
                     </p>
                   </div>
                 </div>
 
                 {/* Age */}
-                <div className="bg-gradient-to-r from-gray-50 to-white p-4 rounded-xl border border-gray-200">
-                  <label className="text-sm font-medium text-gray-500 mb-1 block">Age</label>
+                <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600">
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1 block">Age</label>
                   {isEditing ? (
                     <div>
-                      <input 
-                        type="number" 
+                      <input
+                        type="number"
                         value={editForm.age}
-                        onChange={(e) => setEditForm({...editForm, age: e.target.value})}
-                        className={`w-full px-3 py-2 bg-white border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                          formErrors.age ? 'border-red-300' : 'border-gray-300'
-                        }`}
+                        onChange={(e) => setEditForm({ ...editForm, age: e.target.value })}
+                        className={`w-full px-3 py-2 bg-white border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${formErrors.age ? 'border-red-300' : 'border-gray-300'
+                          }`}
                         placeholder="Enter age (optional)"
                         min="12"
                         max="100"
@@ -678,7 +675,7 @@ export default function MyProfile() {
                   ) : (
                     <div className="flex items-center gap-2">
                       <Calendar className="h-5 w-5 text-gray-400" />
-                      <p className="text-lg font-medium text-gray-900">
+                      <p className="text-lg font-medium text-gray-900 dark:text-white">
                         {profileData?.profile?.age ? `${profileData.profile.age} years` : "Not set"}
                       </p>
                     </div>
@@ -689,23 +686,22 @@ export default function MyProfile() {
 
             {/* Academic Info */}
             <div className="space-y-6">
-              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 <GraduationCap className="h-5 w-5 text-purple-500" />
                 Academic Information
               </h3>
-              
+
               <div className="space-y-4">
                 {/* Education Level - FIXED VALUES */}
-                <div className="bg-gradient-to-r from-gray-50 to-white p-4 rounded-xl border border-gray-200">
-                  <label className="text-sm font-medium text-gray-500 mb-1 block">Education Level *</label>
+                <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600">
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1 block">Education Level *</label>
                   {isEditing ? (
                     <div>
-                      <select 
+                      <select
                         value={editForm.educationLevel}
-                        onChange={(e) => setEditForm({...editForm, educationLevel: e.target.value, educationStage: ""})}
-                        className={`w-full px-3 py-2 bg-white border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                          formErrors.educationLevel ? 'border-red-300' : 'border-gray-300'
-                        }`}
+                        onChange={(e) => setEditForm({ ...editForm, educationLevel: e.target.value, educationStage: "" })}
+                        className={`w-full px-3 py-2 bg-white border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${formErrors.educationLevel ? 'border-red-300' : 'border-gray-300'
+                          }`}
                       >
                         <option value="">Select education level</option>
                         <option value="School">School</option>
@@ -720,7 +716,7 @@ export default function MyProfile() {
                   ) : (
                     <div className="flex items-center gap-2">
                       <GraduationCap className="h-5 w-5 text-gray-400" />
-                      <p className="text-lg font-medium text-gray-900">
+                      <p className="text-lg font-medium text-gray-900 dark:text-white">
                         {displayValue(profileData?.profile?.educationLevel)}
                       </p>
                     </div>
@@ -728,20 +724,19 @@ export default function MyProfile() {
                 </div>
 
                 {/* Education Stage - DYNAMIC BASED ON LEVEL */}
-                <div className="bg-gradient-to-r from-gray-50 to-white p-4 rounded-xl border border-gray-200">
-                  <label className="text-sm font-medium text-gray-500 mb-1 block">
-                    {editForm.educationLevel === "School" ? "Class" : 
-                     ["Undergraduate", "Postgraduate"].includes(editForm.educationLevel) ? "Year" : 
-                     "Stage"}
+                <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600">
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1 block">
+                    {editForm.educationLevel === "School" ? "Class" :
+                      ["Undergraduate", "Postgraduate"].includes(editForm.educationLevel) ? "Year" :
+                        "Stage"}
                   </label>
                   {isEditing ? (
                     <div>
                       <select
                         value={editForm.educationStage || ""}
                         onChange={(e) => setEditForm({ ...editForm, educationStage: e.target.value })}
-                        className={`w-full px-3 py-2 bg-white border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                          formErrors.educationStage ? 'border-red-300' : 'border-gray-300'
-                        }`}
+                        className={`w-full px-3 py-2 bg-white border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${formErrors.educationStage ? 'border-red-300' : 'border-gray-300'
+                          }`}
                         disabled={editForm.educationLevel === "Professional" || !editForm.educationLevel}
                       >
                         {getEducationStageOptions(editForm.educationLevel).map(option => (
@@ -760,9 +755,9 @@ export default function MyProfile() {
                   ) : (
                     <div className="flex items-center gap-2">
                       <GraduationCap className="h-5 w-5 text-gray-400" />
-                      <p className="text-lg font-medium text-gray-900">
-                        {profileData?.profile?.educationLevel === "Professional" 
-                          ? "Not applicable" 
+                      <p className="text-lg font-medium text-gray-900 dark:text-white">
+                        {profileData?.profile?.educationLevel === "Professional"
+                          ? "Not applicable"
                           : displayValue(profileData?.profile?.educationStage)}
                       </p>
                     </div>
@@ -770,20 +765,20 @@ export default function MyProfile() {
                 </div>
 
                 {/* Stream */}
-                <div className="bg-gradient-to-r from-gray-50 to-white p-4 rounded-xl border border-gray-200">
-                  <label className="text-sm font-medium text-gray-500 mb-1 block">Stream/Field</label>
+                <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600">
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1 block">Stream/Field</label>
                   {isEditing ? (
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       value={editForm.stream}
-                      onChange={(e) => setEditForm({...editForm, stream: e.target.value})}
+                      onChange={(e) => setEditForm({ ...editForm, stream: e.target.value })}
                       className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="e.g., Computer Science"
                     />
                   ) : (
                     <div className="flex items-center gap-2">
                       <BookOpen className="h-5 w-5 text-gray-400" />
-                      <p className="text-lg font-medium text-gray-900">
+                      <p className="text-lg font-medium text-gray-900 dark:text-white">
                         {displayValue(profileData?.profile?.stream)}
                       </p>
                     </div>
@@ -791,12 +786,12 @@ export default function MyProfile() {
                 </div>
 
                 {/* Interests - FIXED: Use only profile.interests */}
-                <div className="bg-gradient-to-r from-gray-50 to-white p-4 rounded-xl border border-gray-200">
-                  <label className="text-sm font-medium text-gray-500 mb-1 block">Interests & Skills</label>
+                <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600">
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1 block">Interests & Skills</label>
                   {isEditing ? (
-                    <textarea 
+                    <textarea
                       value={editForm.interests}
-                      onChange={(e) => setEditForm({...editForm, interests: e.target.value})}
+                      onChange={(e) => setEditForm({ ...editForm, interests: e.target.value })}
                       className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-24"
                       placeholder="AI/ML, Web Development, Data Science"
                     />
@@ -805,31 +800,31 @@ export default function MyProfile() {
                       {profileData?.profile?.interests?.length > 0 ? (
                         <div className="flex flex-wrap gap-2">
                           {profileData.profile.interests.map((interest, index) => (
-                            <span 
+                            <span
                               key={index}
-                              className="px-3 py-1.5 bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-700 rounded-lg text-sm font-medium border border-blue-200"
+                              className="px-3 py-1.5 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/30 dark:to-cyan-900/30 text-blue-700 dark:text-blue-300 rounded-lg text-sm font-medium border border-blue-200 dark:border-blue-700"
                             >
                               {interest}
                             </span>
                           ))}
                         </div>
                       ) : (
-                        <p className="text-gray-500 italic">No interests added yet</p>
+                        <p className="text-gray-500 dark:text-gray-400 italic">No interests added yet</p>
                       )}
                     </div>
                   )}
                 </div>
 
                 {/* Security */}
-                <div className="bg-gradient-to-r from-gray-50 to-white p-4 rounded-xl border border-gray-200">
-                  <label className="text-sm font-medium text-gray-500 mb-1 block">Account Security</label>
+                <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600">
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1 block">Account Security</label>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Shield className="h-5 w-5 text-green-500" />
-                      <span className="text-gray-900">Password protected</span>
+                      <span className="text-gray-900 dark:text-white">Password protected</span>
                     </div>
                     <button
-                      className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                      className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium"
                       onClick={() => setShowPasswordModal(true)}
                     >
                       Change Password
@@ -845,14 +840,14 @@ export default function MyProfile() {
         {/* 3. Profile Completion Card */}
         {/* --------------------------- */}
         <div className="">
-          <section className="bg-white rounded-3xl shadow-xl p-6 md:p-8 border border-gray-100">
+          <section className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-6 md:p-8 border border-gray-100 dark:border-gray-700 transition-colors duration-300">
             <div className="flex items-center gap-3 mb-6">
               <div className="h-12 w-12 rounded-xl bg-gradient-to-r from-green-100 to-emerald-100 flex items-center justify-center">
                 <CheckCircle className="h-6 w-6 text-green-600" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Profile Completion</h2>
-                <p className="text-gray-500">Complete your profile for better recommendations</p>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Profile Completion</h2>
+                <p className="text-gray-500 dark:text-gray-400">Complete your profile for better recommendations</p>
               </div>
             </div>
 
@@ -860,11 +855,11 @@ export default function MyProfile() {
               {/* Progress bar */}
               <div>
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium text-gray-700">Progress</span>
-                  <span className="text-2xl font-bold text-gray-900">{profileCompletion}%</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Progress</span>
+                  <span className="text-2xl font-bold text-gray-900 dark:text-white">{profileCompletion}%</span>
                 </div>
-                <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
-                  <div 
+                <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
+                  <div
                     className="h-full bg-gradient-to-r from-green-500 to-emerald-500 rounded-full transition-all duration-1000 ease-out"
                     style={{ width: `${profileCompletion}%` }}
                   />
@@ -881,23 +876,22 @@ export default function MyProfile() {
                   { label: "Education Stage", completed: profileData?.profile?.educationLevel === "Professional" ? true : !!profileData?.profile?.educationStage },
                   { label: "Interests Added", completed: !!(profileData?.profile?.interests?.length) }
                 ].map((item, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                  <div key={index} className="flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
                     <div className="flex items-center gap-3">
-                      <div className={`h-6 w-6 rounded-full flex items-center justify-center ${
-                        item.completed ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'
-                      }`}>
+                      <div className={`h-6 w-6 rounded-full flex items-center justify-center ${item.completed ? 'bg-green-100 dark:bg-green-900/30 text-green-600' : 'bg-gray-100 dark:bg-gray-700 text-gray-400'
+                        }`}>
                         {item.completed ? (
                           <CheckCircle className="h-4 w-4" />
                         ) : (
                           <div className="h-2 w-2 rounded-full bg-current" />
                         )}
                       </div>
-                      <span className={`font-medium ${item.completed ? 'text-gray-900' : 'text-gray-600'}`}>
+                      <span className={`font-medium ${item.completed ? 'text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-400'}`}>
                         {item.label}
                       </span>
                     </div>
                     {!item.completed && (
-                      <button 
+                      <button
                         onClick={() => setIsEditing(true)}
                         className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                       >
@@ -909,7 +903,7 @@ export default function MyProfile() {
               </div>
 
               {/* CTA Button */}
-              <button 
+              <button
                 onClick={() => setIsEditing(true)}
                 className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3.5 rounded-xl font-semibold text-lg hover:from-green-700 hover:to-emerald-700 transform hover:-translate-y-0.5 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
               >
@@ -923,14 +917,14 @@ export default function MyProfile() {
         {/* --------------------------- */}
         {/* 4. Footer Actions */}
         {/* --------------------------- */}
-        <div className="border-2 rounded-lg flex space-x-4 p-4 border-red-500">
+        <div className="border-2 rounded-lg flex space-x-4 p-4 border-red-500 dark:border-red-700">
           <X></X>
           <div>
-            <h4 className="font-bold text-red-500">Want to Delete Account?</h4>
-            <p className="text-gray-600 text-sm">Contact <a className="underline text-blue-500">careerwith.aspirelens@gmail.com</a></p>
+            <h4 className="font-bold text-red-500 dark:text-red-400">Want to Delete Account?</h4>
+            <p className="text-gray-600 dark:text-gray-400 text-sm">Contact <a className="underline text-blue-500 dark:text-blue-400">careerwith.aspirelens@gmail.com</a></p>
           </div>
         </div>
-          {/* <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl p-6 border border-blue-200">
+        {/* <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl p-6 border border-blue-200">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-4">
                 <div className="h-12 w-12 rounded-xl bg-gradient-to-r from-blue-100 to-cyan-100 flex items-center justify-center">
