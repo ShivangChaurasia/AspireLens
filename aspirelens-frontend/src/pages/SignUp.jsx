@@ -3,7 +3,8 @@ import { User, Mail, Lock, Eye, EyeOff, Check, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AuthContext from '../context/authContext';
 import api from '../api/api.js';
-import { signInWithGoogle } from '../firebase.js';
+import { auth, googleProvider } from '../firebase.js';
+import { signInWithPopup } from 'firebase/auth';
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -107,12 +108,12 @@ export default function SignUp() {
   const handleGoogleSignup = async () => {
     try {
       // 1. Open the popup IMMEDIATELY while the user gesture is active
-      const googlePromise = signInWithGoogle();
+      const result = await signInWithPopup(auth, googleProvider);
       
       // 2. Set loading state to show progress spinner
       setIsLoading(true);
       
-      const { idToken } = await googlePromise;
+      const idToken = await result.user.getIdToken();
       const res = await api.post("/api/auth/google-login", { idToken });
       localStorage.setItem("token", res.data.token);
       setUser(res.data.user);
