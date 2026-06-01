@@ -301,14 +301,14 @@ export default function Dashboard() {
                     ⚡ Complete {100 - profileCompletion}% more of your profile for better assessment results
                   </div>
                   <Link to="/profile">
-                    <button className="w-full px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold rounded-xl hover:from-amber-600 hover:to-orange-600 transform hover:-translate-y-0.5 transition-all duration-300">
+                    <button className="w-full px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold rounded-full hover:from-amber-600 hover:to-orange-600 transform hover:-translate-y-0.5 transition-all duration-300">
                       Complete Profile
                     </button>
                   </Link>
                 </div>
               ) : (
                 <Link to="/start-test">
-                  <button className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-700 transform hover:-translate-y-0.5 transition-all duration-300 shadow-lg hover:shadow-xl">
+                  <button className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-full hover:from-blue-700 hover:to-cyan-700 transform hover:-translate-y-0.5 transition-all duration-300 shadow-lg hover:shadow-xl">
                     Start Assessment
                   </button>
                 </Link>
@@ -333,7 +333,7 @@ export default function Dashboard() {
               </p>
 
               {testsTaken > 0 ? (
-                <button className="mt-6 w-full px-6 py-3 bg-gradient-to-r from-orange-300 to-orange-300 text-white font-semibold rounded-xl hover:from-amber-700 hover:to-orange-700 transform hover:-translate-y-0.5 transition-all duration-300 shadow-lg hover:shadow-xl">
+                <button className="mt-6 w-full px-6 py-3 bg-gradient-to-r from-orange-300 to-orange-300 text-white font-semibold rounded-full hover:from-amber-700 hover:to-orange-700 transform hover:-translate-y-0.5 transition-all duration-300 shadow-lg hover:shadow-xl">
                   Coming Soon
                 </button>
               ) : (

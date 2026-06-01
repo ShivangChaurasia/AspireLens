@@ -21,33 +21,33 @@ export default function Navbar() {
       </Link>
 
       {/* Desktop Nav Links */}
-      <ul className="hidden md:flex space-x-8 ml-auto mr-6 font-bold">
-        <li className="hover:text-yellow-300"><Link to="/">Home</Link></li>
-        {!user && <li className="hover:text-yellow-300"><Link to="/adminlogin">Admin Portal</Link></li>}
-        {user && <li className="hover:text-yellow-300"><Link to="/dashboard">Dashboard</Link></li>}
-        {user && user.role === 'admin' && <li className="hover:text-yellow-300"><Link to="/admin/dashboard">Admin Dashboard</Link></li>}
-        {user && <li className="hover:text-yellow-300"><Link to="/profile">My Profile</Link></li>}
-        <li className="hover:text-yellow-300"><Link to="/aboutus">About Us</Link></li>
+      <ul className="hidden md:flex items-center space-x-2 ml-auto mr-6 font-semibold">
+        <li><Link to="/" className="px-4 py-2 rounded-full hover:bg-white/10 hover:text-cyan-100 transition-all duration-300">Home</Link></li>
+        {!user && <li><Link to="/adminlogin" className="px-4 py-2 rounded-full hover:bg-white/10 hover:text-cyan-100 transition-all duration-300">Admin Portal</Link></li>}
+        {user && <li><Link to="/dashboard" className="px-4 py-2 rounded-full hover:bg-white/10 hover:text-cyan-100 transition-all duration-300">Dashboard</Link></li>}
+        {user && user.role === 'admin' && <li><Link to="/admin/dashboard" className="px-4 py-2 rounded-full hover:bg-white/10 hover:text-cyan-100 transition-all duration-300">Admin</Link></li>}
+        {user && <li><Link to="/profile" className="px-4 py-2 rounded-full hover:bg-white/10 hover:text-cyan-100 transition-all duration-300">Profile</Link></li>}
+        <li><Link to="/aboutus" className="px-4 py-2 rounded-full hover:bg-white/10 hover:text-cyan-100 transition-all duration-300">About Us</Link></li>
       </ul>
 
       {/* Desktop Action Buttons */}
-      <div className="hidden md:flex items-center space-x-2 font-bold">
+      <div className="hidden md:flex items-center space-x-3 font-semibold">
         <button
           onClick={toggleDarkMode}
           title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-          className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300 text-xl border border-white/20 hover:scale-110"
+          className="p-2.5 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300 text-lg border border-white/20 hover:scale-105 shadow-sm"
         >
           {darkMode ? '☀️' : '🌙'}
         </button>
 
         {!user && (
           <>
-            <Link to="/login"><button className="hover:text-yellow-300 border-2 rounded-md p-2">Login</button></Link>
-            <Link to="/signup"><button className="hover:text-yellow-300 border-2 rounded-md p-2">SignUp</button></Link>
+            <Link to="/login"><button className="px-5 py-2 border border-white/30 rounded-full hover:bg-white/10 hover:border-white transition-all duration-300">Login</button></Link>
+            <Link to="/signup"><button className="px-5 py-2 bg-white text-blue-600 rounded-full hover:bg-blue-50 hover:shadow-md transition-all duration-300 font-bold">Sign Up</button></Link>
           </>
         )}
         {user && (
-          <button onClick={() => { logout(); navigate("/login"); }} className="hover:text-yellow-300 border-2 rounded-md p-2">
+          <button onClick={() => { logout(); navigate("/login"); }} className="px-5 py-2 border border-white/30 rounded-full hover:bg-red-500/80 hover:border-red-500 transition-all duration-300">
             Logout
           </button>
         )}
@@ -73,27 +73,27 @@ export default function Navbar() {
 
       {/* Mobile Slide-down Menu */}
       {menuOpen && (
-        <div className="md:hidden absolute top-20 left-0 right-0 bg-gradient-to-b from-cyan-600 to-blue-600 dark:from-gray-900 dark:to-gray-800 shadow-xl z-50 py-4 px-6 flex flex-col space-y-4 font-bold text-white">
-          <Link to="/" onClick={closeMenu} className="hover:text-yellow-300 py-2 border-b border-white/20">Home</Link>
-          {!user && <Link to="/adminlogin" onClick={closeMenu} className="hover:text-yellow-300 py-2 border-b border-white/20">Admin Portal</Link>}
-          {user && <Link to="/dashboard" onClick={closeMenu} className="hover:text-yellow-300 py-2 border-b border-white/20">Dashboard</Link>}
-          {user && user.role === 'admin' && <Link to="/admin/dashboard" onClick={closeMenu} className="hover:text-yellow-300 py-2 border-b border-white/20">Admin Dashboard</Link>}
-          {user && <Link to="/profile" onClick={closeMenu} className="hover:text-yellow-300 py-2 border-b border-white/20">My Profile</Link>}
-          <Link to="/aboutus" onClick={closeMenu} className="hover:text-yellow-300 py-2 border-b border-white/20">About Us</Link>
+        <div className="md:hidden absolute top-20 left-0 right-0 bg-gradient-to-b from-cyan-600 to-blue-600 dark:from-gray-900 dark:to-gray-800 shadow-2xl z-50 py-4 px-6 flex flex-col space-y-2 font-semibold text-white border-t border-white/10">
+          <Link to="/" onClick={closeMenu} className="hover:bg-white/10 hover:text-cyan-100 px-4 py-3 rounded-lg transition-all duration-200">Home</Link>
+          {!user && <Link to="/adminlogin" onClick={closeMenu} className="hover:bg-white/10 hover:text-cyan-100 px-4 py-3 rounded-lg transition-all duration-200">Admin Portal</Link>}
+          {user && <Link to="/dashboard" onClick={closeMenu} className="hover:bg-white/10 hover:text-cyan-100 px-4 py-3 rounded-lg transition-all duration-200">Dashboard</Link>}
+          {user && user.role === 'admin' && <Link to="/admin/dashboard" onClick={closeMenu} className="hover:bg-white/10 hover:text-cyan-100 px-4 py-3 rounded-lg transition-all duration-200">Admin Dashboard</Link>}
+          {user && <Link to="/profile" onClick={closeMenu} className="hover:bg-white/10 hover:text-cyan-100 px-4 py-3 rounded-lg transition-all duration-200">Profile</Link>}
+          <Link to="/aboutus" onClick={closeMenu} className="hover:bg-white/10 hover:text-cyan-100 px-4 py-3 rounded-lg transition-all duration-200">About Us</Link>
 
-          <div className="flex flex-col space-y-2 pt-2">
+          <div className="flex flex-col space-y-3 pt-4 pb-2 border-t border-white/10">
             {!user && (
               <>
-                <Link to="/login" onClick={closeMenu}>
-                  <button className="w-full text-left hover:text-yellow-300 border-2 rounded-md p-2">Login</button>
+                <Link to="/login" onClick={closeMenu} className="w-full">
+                  <button className="w-full text-center px-5 py-2.5 border border-white/30 rounded-full hover:bg-white/10 hover:border-white transition-all duration-300">Login</button>
                 </Link>
-                <Link to="/signup" onClick={closeMenu}>
-                  <button className="w-full text-left hover:text-yellow-300 border-2 rounded-md p-2">SignUp</button>
+                <Link to="/signup" onClick={closeMenu} className="w-full">
+                  <button className="w-full text-center px-5 py-2.5 bg-white text-blue-600 rounded-full hover:bg-blue-50 transition-all duration-300 font-bold">Sign Up</button>
                 </Link>
               </>
             )}
             {user && (
-              <button onClick={() => { logout(); navigate("/login"); closeMenu(); }} className="w-full text-left hover:text-yellow-300 border-2 rounded-md p-2">
+              <button onClick={() => { logout(); navigate("/login"); closeMenu(); }} className="w-full text-center px-5 py-2.5 border border-red-400/50 text-red-100 rounded-full hover:bg-red-500/80 hover:border-red-500 hover:text-white transition-all duration-300">
                 Logout
               </button>
             )}

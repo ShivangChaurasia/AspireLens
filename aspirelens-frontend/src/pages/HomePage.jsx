@@ -154,12 +154,12 @@ export default function HomePage() {
 
             {/* ─── LOGGED-IN SECTION ─── */}
             {user && (
-                <section className="min-h-screen flex flex-col items-center justify-center px-6 md:px-20 py-20 bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-100 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 transition-colors duration-300">
+                <section className="min-h-screen flex flex-col items-center justify-center px-6 md:px-12 lg:px-24 py-24 bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-100 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 transition-colors duration-300">
                     <div className="max-w-6xl mx-auto text-center">
 
                         {/* Greeting badge */}
-                        <div className="inline-block mb-6">
-                            <span className="px-5 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-full text-sm md:text-base shadow-lg">
+                        <div className="inline-block mb-8">
+                            <span className="px-6 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-full text-sm md:text-base shadow-lg ring-4 ring-blue-500/20">
                                 👋 Welcome back, {user?.firstName || "Explorer"}!
                             </span>
                         </div>
@@ -179,14 +179,14 @@ export default function HomePage() {
                         </p>
 
                         {/* Action Buttons */}
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+                        <div className="flex flex-col sm:flex-row gap-5 justify-center items-center mb-20">
                             <Link to="/dashboard">
-                                <button className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold text-lg rounded-xl hover:from-blue-700 hover:to-cyan-700 transform hover:-translate-y-1 transition-all duration-300 shadow-xl hover:shadow-2xl w-full sm:w-auto">
+                                <button className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold text-lg rounded-full hover:from-blue-700 hover:to-cyan-700 transform hover:-translate-y-1 hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-[0_0_30px_rgba(6,182,212,0.4)] w-full sm:w-auto border border-cyan-400/30">
                                     Go to Dashboard
                                 </button>
                             </Link>
                             <Link to="/start-test">
-                                <button className="px-8 py-4 bg-white border border-blue-300 text-blue-700 font-semibold text-lg rounded-xl hover:bg-blue-50 transform hover:-translate-y-1 transition-all duration-300 shadow-md w-full sm:w-auto">
+                                <button className="px-8 py-4 bg-white dark:bg-gray-800 border-2 border-blue-200 dark:border-gray-600 text-blue-700 dark:text-blue-400 font-semibold text-lg rounded-full hover:bg-blue-50 dark:hover:bg-gray-700 hover:border-blue-400 dark:hover:border-blue-500 transform hover:-translate-y-1 transition-all duration-300 shadow-md w-full sm:w-auto">
                                     Take Career Assessment
                                 </button>
                             </Link>
@@ -276,7 +276,7 @@ export default function HomePage() {
                     <div data-section="button" className={`mb-20 transition-all duration-1000 delay-500 ${isVisible.button ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
                         <Link to={user ? "/dashboard" : "/login"}>
                             <div className="relative inline-block group">
-                                <button className="relative px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold text-lg rounded-xl overflow-hidden transform group-hover:scale-105 group-hover:shadow-[0_0_40px_rgba(6,182,212,0.5)] transition-all duration-500">
+                                <button className="relative px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold text-lg rounded-full overflow-hidden transform group-hover:scale-105 group-hover:shadow-[0_0_40px_rgba(6,182,212,0.5)] transition-all duration-500 border border-cyan-400/30">
                                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                                     <span className="relative z-10 flex items-center gap-3">
                                         <span className="group-hover:rotate-12 transition-transform duration-300">🚀</span>
@@ -284,7 +284,7 @@ export default function HomePage() {
                                         <span className="group-hover:translate-x-2 transition-transform duration-300">→</span>
                                     </span>
                                 </button>
-                                <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/30 via-cyan-500/30 to-blue-500/30 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+                                <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/30 via-cyan-500/30 to-blue-500/30 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 rounded-full" />
                                 <div className="absolute -top-2 -right-2 w-4 h-4 bg-cyan-400 rounded-full animate-ping" />
                                 <div className="absolute -bottom-2 -left-2 w-3 h-3 bg-blue-400 rounded-full animate-ping" style={{ animationDelay: '0.2s' }} />
                             </div>
@@ -350,10 +350,10 @@ export default function HomePage() {
                     {/* Guest CTA */}
                     {!user && (
                         <div className="mt-16 text-center">
-                            <p className="text-gray-400 mb-4">Don't have an account?</p>
+                            <p className="text-gray-400 mb-4 text-lg">Don't have an account?</p>
                             <Link to="/signup">
-                                <button className="px-6 py-3 border border-cyan-500/40 text-cyan-300 rounded-xl hover:bg-cyan-500/10 hover:border-cyan-500/60 transition-all duration-300 font-medium">
-                                    Create Free Account →
+                                <button className="px-8 py-3.5 border border-cyan-500/40 text-cyan-300 rounded-full hover:bg-cyan-500/10 hover:border-cyan-400 hover:text-cyan-200 transition-all duration-300 font-semibold shadow-lg hover:shadow-cyan-500/20">
+                                    Create Free Account <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">→</span>
                                 </button>
                             </Link>
                         </div>
