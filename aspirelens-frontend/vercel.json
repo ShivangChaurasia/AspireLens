@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/__/auth/:path*",
+      "destination": "https://aspirelens-80e6b.firebaseapp.com/__/auth/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/"
     }
