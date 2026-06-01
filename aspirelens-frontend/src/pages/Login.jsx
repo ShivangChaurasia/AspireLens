@@ -3,7 +3,7 @@ import { Eye, EyeOff, Mail, Lock, ArrowRight, ArrowLeft } from 'lucide-react';
 import api from "../api/api.js";
 import { useNavigate } from "react-router-dom";
 import AuthContext from '../context/authContext';
-import { signInWithGoogle, handleGoogleRedirectResult } from '../firebase.js';
+import { signInWithGoogle } from '../firebase.js';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -52,30 +52,6 @@ export default function Login() {
       });
   }, []);
 
-  // Handle Google Sign-In redirect callback on mount
-  useEffect(() => {
-    const checkRedirect = async () => {
-      try {
-        const redirectData = await handleGoogleRedirectResult();
-        if (redirectData) {
-          setIsLoading(true);
-          const { idToken } = redirectData;
-          const res = await api.post("/api/auth/google-login", { idToken });
-          localStorage.setItem("token", res.data.token);
-          setUser(res.data.user);
-          navigate("/");
-          console.log("Google Login Successful via Redirect:", res.data);
-        }
-      } catch (error) {
-        console.error("Google Redirect Login Error:", error.response?.data || error);
-        alert(error.response?.data?.message || "Google redirect login failed. Please try again.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    checkRedirect();
-  }, [navigate, setUser]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -102,6 +78,7 @@ export default function Login() {
 
 
   const handleGoogleLogin = async () => {
+    setIsLoading(true);
     try {
       const { idToken } = await signInWithGoogle();
       const res = await api.post("/api/auth/google-login", { idToken });
@@ -110,8 +87,14 @@ export default function Login() {
       navigate("/");
       console.log("Google Login Successful:", res.data);
     } catch (error) {
-      console.error("Google Login Error:", error.response?.data || error);
-      alert(error.response?.data?.message || "Google login failed. Please try again.");
+      console.error("Google Login Error:", error);
+      if (error.code === 'auth/popup-blocked') {
+        alert("Popup blocked! Please allow popups for this site in your browser settings (look for the popup blocker icon in the address bar) and try again.");
+      } else {
+        alert(error.response?.data?.message || "Google login failed. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
