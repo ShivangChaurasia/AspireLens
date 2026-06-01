@@ -3,7 +3,7 @@ import { Eye, EyeOff, Mail, Lock, ArrowRight, ArrowLeft } from 'lucide-react';
 import api from "../api/api.js";
 import { useNavigate } from "react-router-dom";
 import AuthContext from '../context/authContext';
-import { signInWithGoogle } from '../firebase.js';
+import { signInWithGoogle, handleGoogleRedirectResult } from '../firebase.js';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -51,6 +51,30 @@ export default function Login() {
         console.warn('Failed to load animation:', error);
       });
   }, []);
+
+  // Handle Google Sign-In redirect callback on mount
+  useEffect(() => {
+    const checkRedirect = async () => {
+      try {
+        const redirectData = await handleGoogleRedirectResult();
+        if (redirectData) {
+          setIsLoading(true);
+          const { idToken } = redirectData;
+          const res = await api.post("/api/auth/google-login", { idToken });
+          localStorage.setItem("token", res.data.token);
+          setUser(res.data.user);
+          navigate("/");
+          console.log("Google Login Successful via Redirect:", res.data);
+        }
+      } catch (error) {
+        console.error("Google Redirect Login Error:", error.response?.data || error);
+        alert(error.response?.data?.message || "Google redirect login failed. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    checkRedirect();
+  }, [navigate, setUser]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
