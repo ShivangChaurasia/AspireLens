@@ -105,9 +105,14 @@ export default function SignUp() {
   };
 
   const handleGoogleSignup = async () => {
-    setIsLoading(true);
     try {
-      const { idToken } = await signInWithGoogle();
+      // 1. Open the popup IMMEDIATELY while the user gesture is active
+      const googlePromise = signInWithGoogle();
+      
+      // 2. Set loading state to show progress spinner
+      setIsLoading(true);
+      
+      const { idToken } = await googlePromise;
       const res = await api.post("/api/auth/google-login", { idToken });
       localStorage.setItem("token", res.data.token);
       setUser(res.data.user);
@@ -281,7 +286,7 @@ export default function SignUp() {
 
             {/* Email Field */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Email Address
               </label>
               <div className="relative">
@@ -292,7 +297,7 @@ export default function SignUp() {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  className="pl-10 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400"
                   placeholder="you@example.com"
                   required
                 />

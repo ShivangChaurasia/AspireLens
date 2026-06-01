@@ -78,9 +78,14 @@ export default function Login() {
 
 
   const handleGoogleLogin = async () => {
-    setIsLoading(true);
     try {
-      const { idToken } = await signInWithGoogle();
+      // 1. Open the popup IMMEDIATELY while the user gesture is active
+      const googlePromise = signInWithGoogle();
+      
+      // 2. Set loading state to show progress spinner
+      setIsLoading(true);
+      
+      const { idToken } = await googlePromise;
       const res = await api.post("/api/auth/google-login", { idToken });
       localStorage.setItem("token", res.data.token);
       setUser(res.data.user);
