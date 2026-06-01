@@ -33,7 +33,9 @@ export default function AuthProvider({ children }) {
 
         setUser(res.data.user);
         setIsAuthenticated(true); // ✅ Set to true when user loads
-      } catch {
+      } catch (error) {
+        console.warn("Session expired or invalid token. Clearing session.");
+        localStorage.removeItem("token");
         setUser(null);
         setIsAuthenticated(false); // ✅ Set to false on error
       }
