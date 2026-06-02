@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import AuthContext from '../context/authContext';
 import api from '../api/api.js';
 import { auth, googleProvider } from '../firebase.js';
-import { signInWithPopup } from 'firebase/auth';
+import { signInWithPopup, signInWithRedirect, getRedirectResult } from 'firebase/auth';
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -37,6 +37,28 @@ export default function SignUp() {
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
+
+  // Check for Google Redirect Result on Mount
+  useEffect(() => {
+    const checkRedirect = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result) {
+          setIsLoading(true);
+          const idToken = await result.user.getIdToken();
+          const res = await api.post("/api/auth/google-login", { idToken });
+          localStorage.setItem("token", res.data.token);
+          setUser(res.data.user);
+          navigate("/");
+          console.log("Google Signup Redirect Successful:", res.data);
+        }
+      } catch (error) {
+        console.error("Google Redirect Error:", error);
+        alert(error.response?.data?.message || "Google sign-up failed. Please try again.");
+      }
+    };
+    checkRedirect();
+  }, [navigate, setUser]);
 
   // Load Lottie animation
   useEffect(() => {
@@ -121,13 +143,18 @@ export default function SignUp() {
       console.log("Google Signup Successful:", res.data);
     } catch (error) {
       console.error("Google Signup Error:", error);
-      if (error.code === 'auth/popup-blocked') {
-        alert("Popup blocked! Please allow popups for this site in your browser settings (look for the popup blocker icon in the address bar) and try again.");
+      if (error.code === 'auth/popup-blocked' || error.code === 'auth/popup-closed-by-user') {
+        console.log("Popup blocked or closed, falling back to redirect...");
+        setIsLoading(true);
+        signInWithRedirect(auth, googleProvider).catch((err) => {
+           console.error("Redirect also failed:", err);
+           setIsLoading(false);
+           alert("Google sign-up failed. Please try again.");
+        });
       } else {
         alert(error.response?.data?.message || "Google sign-up failed. Please try again.");
+        setIsLoading(false);
       }
-    } finally {
-      setIsLoading(false);
     }
   };
 
