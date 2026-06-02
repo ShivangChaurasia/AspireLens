@@ -155,7 +155,7 @@ export const googleLogin = async (req, res) => {
     const lastName = rest.join(" ") || "";
 
     // 2️⃣ Upsert user in MongoDB
-    let user = await User.findOne({ $or: [{ email }, { firebaseUid: uid }] });
+    let user = await User.findOne({ $or: [{ email }, { googleId: uid }] });
 
     if (!user) {
       // New Google user — create in MongoDB
@@ -163,19 +163,18 @@ export const googleLogin = async (req, res) => {
         firstName,
         lastName,
         email,
-        firebaseUid: uid,
-        passwordHash: null,          // No password for Google users
+        googleId: uid,
+        passwordHash: "GOOGLE_OAUTH_NO_PASSWORD", // Bypass required validation for Google users
         role: "student",
         isEmailVerified: true,
-        authProvider: "google",
       });
       await user.save();
       console.log("✅ New Google user created in MongoDB:", email);
-    } else if (!user.firebaseUid) {
-      // Existing email user — sync Firebase UID
-      user.firebaseUid = uid;
+    } else if (!user.googleId) {
+      // Existing email user — sync Google ID
+      user.googleId = uid;
       await user.save();
-      console.log("✅ Synced Firebase UID for existing user:", email);
+      console.log("✅ Synced Google ID for existing user:", email);
     }
 
     await updateUserActivity(user._id);
